@@ -55,15 +55,26 @@ const LumiSpirit = ({ isSidebarExpanded, onPointsUpdate }) => {
       const reply = await askGemini(systemPrompt, input, chatHistory);
 
       setMessages(prev => [...prev, {
+        role: 'model',
+        text: reply,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
       
-      if (onPointsUpdate) onPointsUpdate('CHAT_INSIGHT');
     } catch (error) {
       console.error("Lumi AI error:", error);
+
+      let errorText;
+      if (error.message === "QUOTA_EXHAUSTED") {
+        errorText = "My energy has been fully spent for today, Guardian. 🌙 The cosmic quota resets at midnight — come find me then! ✨";
+      } else if (error.message === "RATE_LIMITED") {
+        errorText = "I'm receiving too many echoes at once. 🌀 Please wait a moment before we speak again.";
+      } else {
+        errorText = "I seem to have lost my connection to the Earth's pulse. 🌿 Please try again shortly.";
+      }
+
       setMessages(prev => [...prev, {
         role: 'model',
-        text: "I seem to have lost my connection to the Earth's pulse. 🌿 Please try again.",
+        text: errorText,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     } finally {

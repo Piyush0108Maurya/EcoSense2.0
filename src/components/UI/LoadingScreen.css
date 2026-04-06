@@ -82,8 +82,8 @@
 /* Visual: Ring & Icon */
 .ls-visual {
   position: relative;
-  width: 240px;
-  height: 240px;
+  width: 320px;
+  height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,9 +128,9 @@
 }
 
 .ls-center-icon span {
-  font-size: 56px;
+  font-size: 72px;
   color: var(--primary);
-  filter: drop-shadow(0 0 12px var(--primary-glow));
+  filter: drop-shadow(0 0 16px var(--primary-glow));
   animation: eco-pulse 3s infinite ease-in-out;
 }
 

@@ -70,16 +70,19 @@ const LumiChat = ({ onPointsUpdate }) => {
       const reply = await askGemini(systemPrompt, textToSend, chatHistory);
 
       setMessages(prev => [...prev, {
+        role: 'model',
+        text: reply,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
       
-      // Award points for AI interaction
-      if (onPointsUpdate) onPointsUpdate('CHAT_INSIGHT');
     } catch (error) {
       console.error("Lumi AI error:", error);
+      const isRateLimit = error.message.includes("Rate limit");
       setMessages(prev => [...prev, {
         role: 'model',
-        text: "I seem to have lost my connection to the Earth's pulse. 🌿 Please try asking me again in a moment.",
+        text: isRateLimit 
+          ? "The spirits are overwhelmed by too many echoes right now. 🌪️ Please wait a moment for the winds to settle."
+          : "I seem to have lost my connection to the Earth's pulse. 🌿 Please try asking me again in a moment.",
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
     } finally {

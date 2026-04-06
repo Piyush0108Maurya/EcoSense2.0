@@ -28,6 +28,12 @@ export const DB = {
     if (!reward) return user;
 
     const streakRes = checkStreak(user.lastActive, user.streak || 0);
+
+    // Limit daily login points to strictly once a day
+    if (activityType === 'DAILY_CHECKIN' && !streakRes.newActivity) {
+      return null;
+    }
+
     const finalXP = Math.floor(reward.xp * (streakRes.bonusMultiplier || 1));
 
     user.points = (user.points || 0) + finalXP;

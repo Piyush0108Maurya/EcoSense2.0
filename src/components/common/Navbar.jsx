@@ -11,7 +11,7 @@ const Navbar = ({ activeTab, setActiveTab, user, onAuthClick, onLogout }) => {
       borderBottom: '1px solid var(--border-subtle)', padding: '0 28px'
     }}>
       <div className="nav-col-1" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <img src={logo} alt="EcoSense Logo" style={{ height: '32px', width: 'auto', cursor: 'pointer' }} onClick={() => setActiveTab('dashboard')} />
+        <img src={logo} alt="EcoSense Logo" style={{ height: '46px', width: 'auto', cursor: 'pointer' }} onClick={() => setActiveTab('dashboard')} />
         <span style={{ fontFamily: 'var(--font-headline)', fontWeight: 600, fontSize: '18px', color: 'var(--on-surface)' }}>EcoSense</span>
       </div>
 

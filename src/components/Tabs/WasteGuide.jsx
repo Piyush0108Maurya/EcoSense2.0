@@ -58,6 +58,9 @@ const WasteGuide = ({ onPointsUpdate }) => {
     setSelectedCategory(catId); setIsMenuOpen(false);
     if (location) setCollectors(getNearestCollectors(location, catId));
     else detectLocation();
+    
+    // Award points for using EcoSort analysis
+    if (onPointsUpdate) onPointsUpdate('WASTE_SCAN', { item: WASTE_CATEGORIES.find(c => c.id === catId)?.label });
   };
 
   const handleContacted = (collector) => {

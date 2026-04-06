@@ -168,6 +168,45 @@
   height: 100%;
 }
 
+.matrix-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.matrix-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.matrix-subtitle {
+  font-size: 13px;
+  color: var(--on-surface-variant);
+}
+
+.matrix-telemetry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.telemetry-value {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--primary);
+  font-family: var(--font-headline);
+}
+
+.telemetry-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--on-surface-variant);
+  letter-spacing: 0.05em;
+  font-weight: 700;
+}
+
 .progression-track {
   position: relative;
   height: 6rem;
@@ -370,19 +409,20 @@ canvas {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 2px;
   white-space: nowrap;
 }
 
 .node-rank {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   color: var(--on-surface-variant);
 }
 
 .node-points {
-  font-size: 8px;
+  font-size: 10px;
   color: var(--on-surface-variant);
-  opacity: 0.5;
+  opacity: 0.6;
 }
 
 /* Profile Info */

@@ -162,14 +162,14 @@ const DashboardTab = ({ activeSubTab, user }) => {
               <div className="progression-nodes">
                 <div className="progression-node">
                   <div className={`node-dot active`}></div>
-                  <div className="node-label-wrap">
+                  <div className="node-label-wrap" style={{ alignItems: 'flex-start' }}>
                     <span className="node-rank text-white">{level.label.split(' ')[1]}</span>
                     <span className="node-points">NOW</span>
                   </div>
                 </div>
-                <div className="progression-node" style={{ left: '100%' }}>
+                <div className="progression-node">
                   <div className={`node-dot`}></div>
-                  <div className="node-label-wrap" style={{ transform: 'translateX(-100%)' }}>
+                  <div className="node-label-wrap" style={{ alignItems: 'flex-end' }}>
                     <span className="node-rank">NEXT GEN</span>
                     <span className="node-points">{level.nextThreshold || '---'}</span>
                   </div>

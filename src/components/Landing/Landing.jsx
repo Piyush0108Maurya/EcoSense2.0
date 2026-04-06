@@ -104,7 +104,7 @@ const Landing = ({ onStart }) => {
                 icon: '📍',
                 color: '#FB923C',
                 colorDim: 'rgba(251,146,60,0.12)',
-                title: 'Neighbourhood Heatmap',
+                title: 'Neighbour Waste Heatmap',
                 desc: "Pin waste violations on a live Leaflet map. See your area's pollution hotspots and coordinate community clean-ups.",
               },
               {

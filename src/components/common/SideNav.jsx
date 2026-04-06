@@ -25,7 +25,7 @@ const NAV_ITEMS = [
   },
   {
     tab: 'neighbour',
-    label: 'Neighbourhood',
+    label: 'Neighbour Waste',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -98,7 +98,7 @@ const SideNav = ({ activeTab, setActiveTab, user, expanded, setExpanded, onLogou
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <img src={logo} alt="Logo" style={{ width: '16px', height: '16px' }} />
+            <img src={logo} alt="Logo" style={{ width: '22px', height: '22px' }} />
             <div style={{
               fontSize: '9px',
               fontFamily: 'Space Grotesk, sans-serif',

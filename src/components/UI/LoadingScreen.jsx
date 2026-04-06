@@ -75,7 +75,7 @@ const LoadingScreen = ({ onComplete, readyToUnmount }) => {
             
             {/* Center Icon replaced with Logo */}
             <div className="ls-center-icon">
-              <img src={logo} alt="EcoSense Logo" style={{ width: '40px', height: '40px', filter: 'drop-shadow(0 0 10px rgba(138, 235, 255, 0.4))' }} />
+              <img src={logo} alt="EcoSense Logo" style={{ width: '90px', height: '90px', filter: 'drop-shadow(0 0 20px rgba(138, 235, 255, 0.7))', animation: 'eco-pulse 3s infinite ease-in-out' }} />
             </div>
 
             {/* Orbiting Particles */}
@@ -96,7 +96,7 @@ const LoadingScreen = ({ onComplete, readyToUnmount }) => {
         </div>
 
         <div className="ls-brand">
-          <img src={logo} alt="Logo" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
+          <img src={logo} alt="Logo" style={{ width: '36px', height: '36px', marginRight: '8px' }} />
           <span className="ls-brand-name">ECOSENSE</span>
         </div>
       </div>

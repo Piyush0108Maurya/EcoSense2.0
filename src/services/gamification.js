@@ -9,8 +9,7 @@ export const REWARD_TYPES = {
   WASTE_PIN:     { xp: 100, label: 'Geo-Waste Reporting',   icon: 'add_location_alt' },
   CHAT_INSIGHT:  { xp: 5,   label: 'Lumi Intelligence',     icon: 'forest' },
   CONTACT_HUB:   { xp: 15,  label: 'Collector Outreach',    icon: 'handshake' },
-  QUIZ_MASTER:   { xp: 200, label: 'Eco-Expertise',         icon: 'school' },
-  AQI_CHECK:     { xp: 10,  label: 'Air Quality Audit',     icon: 'air' }
+  QUIZ_MASTER:   { xp: 200, label: 'Eco-Expertise',         icon: 'school' }
 };
 
 export const LEVELS = [

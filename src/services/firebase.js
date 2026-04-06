@@ -142,6 +142,12 @@ export const addActivityPoints = async (userId, activityType, metadata = {}) => 
 
   // Streak/Daily logic
   const streakRes = checkStreak(userData.lastActive, userData.streak || 0);
+
+  // Guarantee: Only one daily login per day across the cloud
+  if (activityType === 'DAILY_CHECKIN' && !streakRes.newActivity) {
+    return null;
+  }
+
   const finalXP = Math.floor(reward.xp * (streakRes.bonusMultiplier || 1));
 
   const updatePayload = {

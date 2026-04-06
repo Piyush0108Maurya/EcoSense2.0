@@ -91,7 +91,7 @@ html { scroll-behavior: smooth; }
   box-shadow: 0 8px 40px rgba(0,0,0,0.5);
 }
 .lp-nav__brand { display: flex; align-items: center; gap: 10px; }
-.lp-nav__logo  { height: 34px; width: auto; }
+.lp-nav__logo  { height: 44px; width: auto; }
 .lp-nav__name  { font-family: var(--ff-head); font-weight: 800; font-size: 22px; color: #fff; }
 .lp-nav__links { display: flex; gap: 36px; }
 .lp-nav__links a {

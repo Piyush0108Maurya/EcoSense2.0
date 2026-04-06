@@ -1,53 +1,89 @@
 export const WAQI_TOKEN = import.meta.env.VITE_WAQI_TOKEN;
 export const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY;
 
+// Debug: confirm the key is loaded after every dev server restart
+console.log(`[Lumi API] Key loaded: ${GEMINI_KEY ? GEMINI_KEY.slice(0, 8) + '...' : '❌ MISSING — check .env'}`);
+
 export async function askGemini(systemPrompt, userMessage, history = []) {
-  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_KEY}`;
+  // gemini-2.5-flash on v1beta — latest stable model with 15 RPM free tier
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_KEY}`;
 
-  const contents = [];
+  console.log("Lumi Spirit: Connecting via gemini-2.5-flash on v1beta...");
 
-  // Add conversation history for chatbot continuity
+  const contents = [
+    { role: "user", parts: [{ text: `SYSTEM_CONTEXT: ${systemPrompt}` }] },
+    { role: "model", parts: [{ text: "Understood. I am Lumi, the Eco Intelligence. Ready for your request." }] }
+  ];
+
   for (const msg of history) {
-    contents.push({
-      role: msg.role,
-      parts: [{ text: msg.text }]
-    });
+    if (msg.text && msg.role) {
+      contents.push({
+        role: msg.role === 'user' ? 'user' : 'model',
+        parts: [{ text: msg.text }]
+      });
+    }
   }
 
   contents.push({ role: "user", parts: [{ text: userMessage }] });
 
   const body = {
-    system_instruction: { parts: [{ text: systemPrompt }] },
-    contents: contents,
-    generationConfig: { temperature: 0.7, maxOutputTokens: 800 }
+    contents,
+    generationConfig: {
+      temperature: 0.8,
+      maxOutputTokens: 600,
+      topP: 0.95,
+    }
   };
 
-  // Retry logic with exponential backoff for rate limits
-  const MAX_RETRIES = 3;
+  const MAX_RETRIES = 2;
+
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const response = await fetch(GEMINI_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      return data.candidates[0].content.parts[0].text;
-    }
-
-    const status = response.status;
-    if (status === 429 && attempt < MAX_RETRIES) {
-      // Wait with exponential backoff: 2s, 4s, 8s
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt + 1) * 1000));
+    // Fetch inside its own try/catch — business-logic throws BELOW are never swallowed
+    let response, data;
+    try {
+      response = await fetch(GEMINI_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      data = await response.json();
+    } catch (networkErr) {
+      if (attempt === MAX_RETRIES) throw new Error("Network error — check your connection.");
+      await new Promise(r => setTimeout(r, 2000));
       continue;
     }
 
-    const err = await response.json().catch(() => ({}));
-    if (status === 429) {
-      throw new Error("Rate limit exceeded. Please wait a moment and try again.");
+    // ── Success ──────────────────────────────────────────────────────────────
+    if (response.ok && data.candidates?.[0]?.content?.parts?.[0]?.text) {
+      return data.candidates[0].content.parts[0].text;
     }
-    throw new Error(err?.error?.message || `Gemini API error (${status})`);
+
+    console.error(`Gemini API Detail [${response.status}]:`, data);
+    const errMsg = data.error?.message || "";
+
+    // ── 404: wrong model name or endpoint ────────────────────────────────────
+    if (response.status === 404) {
+      throw new Error(`MODEL_NOT_FOUND: ${errMsg}`);
+    }
+
+    // ── 429: rate limited ─────────────────────────────────────────────────────
+    if (response.status === 429) {
+      if (attempt < MAX_RETRIES) {
+        const retryMatch = errMsg.match(/retry in (\d+(?:\.\d+)?)s/i);
+        const waitMs = retryMatch
+          ? Math.ceil(parseFloat(retryMatch[1])) * 1000 + 500
+          : 10000 * (attempt + 1);
+        console.warn(`Lumi: Rate limited. Retrying in ${waitMs / 1000}s (attempt ${attempt + 1}/${MAX_RETRIES})...`);
+        await new Promise(r => setTimeout(r, waitMs));
+        continue;
+      }
+      // All retries exhausted — distinguish daily quota vs RPM spike
+      const isDailyExhausted = errMsg.includes("free_tier") && errMsg.includes("limit: 0");
+      throw new Error(isDailyExhausted ? "QUOTA_EXHAUSTED" : "RATE_LIMITED");
+    }
+
+    // ── Other API error ───────────────────────────────────────────────────────
+    throw new Error(errMsg || "Failed to receive response from Lumi.");
   }
 }
 

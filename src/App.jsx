@@ -145,7 +145,7 @@ function App() {
           />
         )}
 
-        <PointsProgress user={user} />
+
 
         <div className="view-panel" style={{ paddingTop: (activeTab === 'neighbour' || activeTab === 'waste') ? '0' : '72px' }}>
           {(activeTab === 'aqi') && <AQI activeSubTab={activeSubTab} onPointsUpdate={handlePointsUpdate} />}

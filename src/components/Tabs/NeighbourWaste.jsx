@@ -24,6 +24,27 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
+// Floating button to smoothly fly to user location
+const LocateControl = ({ userLocation }) => {
+  const map = useMap();
+  return (
+    <button 
+      className="floating-locate-btn"
+      onClick={(e) => {
+        e.stopPropagation();
+        if (userLocation) {
+          map.flyTo(userLocation, 15, { duration: 1.5, easeLinearity: 0.25 });
+        } else {
+          alert("GPS coordinates still locking in. Please wait a moment or check permissions.");
+        }
+      }}
+      title="Fly to My Location"
+    >
+      <span className="material-symbols-outlined">my_location</span>
+    </button>
+  );
+};
+
 const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -202,6 +223,9 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
               />
+              
+              {/* Custom Google-maps style floating locate button */}
+              <LocateControl userLocation={userLocation} />
               
               {/* User Live Location Marker */}
               {userLocation && (

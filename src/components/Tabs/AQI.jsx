@@ -52,6 +52,80 @@ const AnimatedBar = ({ pct, color, delay = 0 }) => {
   );
 };
 
+/* ─── Cigarette Equivalent Card ───────────────────────────────────────────── */
+// Berkeley Earth: 22 µg/m³ PM2.5 daily average ≈ 1 cigarette/day
+const CigaretteCard = ({ pm25, aqi }) => {
+  const effectivePm25 = pm25 != null ? pm25 : (aqi > 0 ? aqi / 4.5 : 0);
+  const cigarettes = Math.max(0, effectivePm25 / 22);
+  const displayCigs = Math.round(cigarettes * 10) / 10;
+  
+  const risk = 
+    cigarettes < 0.5 ? { label: 'Safe', color: '#3FB950', desc: 'No significant lung stress' }
+    : cigarettes < 1  ? { label: 'Low', color: '#8AEBFF', desc: 'Minimal particle inhalation' }
+    : cigarettes < 2  ? { label: 'Mod', color: '#D29922', desc: 'Mild airway irritation' }
+    : cigarettes < 5  ? { label: 'High', color: '#E3642B', desc: 'Active lung damage risk' }
+    : { label: 'Severe', color: '#F85149', desc: 'Extreme respiratory hazard' };
+
+  return (
+    <div className="aqi-animate-in" style={{
+      display: 'flex',
+      alignItems: 'center',
+      gap: 14,
+      padding: '10px 18px',
+      background: 'rgba(13, 17, 23, 0.7)',
+      backdropFilter: 'blur(15px)',
+      border: `1px solid ${risk.color}35`,
+      borderRadius: '14px',
+      flexShrink: 0,
+      minHeight: '52px',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: `0 8px 32px rgba(0,0,0,0.3)`
+    }}>
+      <div style={{
+        position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px',
+        background: risk.color, boxShadow: `0 0 12px ${risk.color}`
+      }} />
+      
+      <div style={{ 
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: '36px', height: '36px', borderRadius: '10px',
+        background: `${risk.color}15`, border: `1px solid ${risk.color}30`,
+        fontSize: '20px', filter: `drop-shadow(0 0 4px ${risk.color})` 
+      }}>🚬</div>
+      
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+            <span style={{ 
+              fontSize: '22px', fontWeight: 900, color: risk.color, 
+              fontFamily: 'Space Grotesk, sans-serif', letterSpacing: '-0.5px'
+            }}>{displayCigs}</span>
+            <span style={{ fontSize: '10px', color: '#fff', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Cigarettes / Day
+            </span>
+          </div>
+          <div style={{ 
+            fontSize: '9px', fontWeight: 900, padding: '2px 6px', 
+            borderRadius: '4px', background: risk.color, 
+            color: '#000', textTransform: 'uppercase', letterSpacing: '0.05em'
+          }}>
+            {risk.label}
+          </div>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span className="material-symbols-outlined" style={{ fontSize: '12px', color: '#7D8590' }}>respiratory_rate</span>
+          <span style={{ fontSize: '11px', color: '#7D8590', fontWeight: 500 }}>
+            {risk.desc} <span style={{ color: '#4A5568', margin: '0 4px' }}>·</span> PM₂.₅ equivalent
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 /* ─── Gauge SVG ───────────────────────────────────────────────────────────── */
 const GAUGE_R = 80;
 const GAUGE_C = GAUGE_R * 2 * Math.PI;
@@ -350,8 +424,6 @@ const AQI = ({ activeSubTab, onPointsUpdate }) => {
       const key = CITY_KEYS[cityName] || target.toLowerCase();
       setTickerData(prev => ({ ...prev, [key]: waqiRes.aqi }));
 
-      // Award points for checking AQI
-      if (onPointsUpdate) onPointsUpdate('AQI_CHECK', { city: cityName, aqi: waqiRes.aqi });
     } catch (err) {
       console.error("AQI Load Error:", err);
       setError('Could not load air quality data. Please try again.');
@@ -586,7 +658,11 @@ const AQI = ({ activeSubTab, onPointsUpdate }) => {
               </div>
             </div>
           ))}
+
+          {/* Cigarette Equivalent Card moved out to header */}
         </div>
+
+
       </div>
 
       {/* Extra stats row: pressure, dew point */}
@@ -1084,25 +1160,30 @@ const AQI = ({ activeSubTab, onPointsUpdate }) => {
             </p>
           </div>
 
-          {/* City Switcher */}
-          <div className="aqi-city-bar aqi-animate-in aqi-stagger-1">
-            {CITIES.map(city => (
-              <button
-                key={city}
-                onClick={() => loadData(CITY_KEYS[city], city)}
-                disabled={cityLoading}
-                className={`aqi-city-chip${activeCity === city ? ' active' : ''}`}
-                style={activeCity === city ? { background: sev.color, color: '#000', borderColor: 'transparent' } : {}}
-              >
-                {cityLoading && activeCity === city
-                  ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                    <span className="aqi-spinner" style={{ width: 10, height: 10, borderWidth: 2, borderTopColor: '#000' }} />
-                    {city}
-                  </span>
-                  : city
-                }
-              </button>
-            ))}
+          {/* City Switcher + Cigarette Card */}
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div className="aqi-city-bar aqi-animate-in aqi-stagger-1" style={{ margin: 0, flex: 1 }}>
+              {CITIES.map(city => (
+                <button
+                  key={city}
+                  onClick={() => loadData(CITY_KEYS[city], city)}
+                  disabled={cityLoading}
+                  className={`aqi-city-chip${activeCity === city ? ' active' : ''}`}
+                  style={activeCity === city ? { background: sev.color, color: '#000', borderColor: 'transparent' } : {}}
+                >
+                  {cityLoading && activeCity === city
+                    ? <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                      <span className="aqi-spinner" style={{ width: 10, height: 10, borderWidth: 2, borderTopColor: '#000' }} />
+                      {city}
+                    </span>
+                    : city
+                  }
+                </button>
+              ))}
+            </div>
+            
+            {/* Horizontal Cigarette Card */}
+            <CigaretteCard pm25={pm25} aqi={aqi} />
           </div>
 
           <hr className="aqi-divider" />
