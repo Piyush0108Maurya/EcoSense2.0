@@ -36,7 +36,7 @@ const NAV_ITEMS = [
   },
 ];
 
-const SideNav = ({ activeTab, setActiveTab, user, expanded, setExpanded }) => {
+const SideNav = ({ activeTab, setActiveTab, user, expanded, setExpanded, onLogout }) => {
   const COLLAPSED_W = 56;
   const EXPANDED_W = 220;
   const width = expanded ? EXPANDED_W : COLLAPSED_W;
@@ -286,7 +286,7 @@ const SideNav = ({ activeTab, setActiveTab, user, expanded, setExpanded }) => {
 
           {/* Logout Button */}
           <button
-            onClick={() => console.log('Logout clicked')} // Placeholder for logout logic
+            onClick={onLogout}
             title={!expanded ? 'Logout' : undefined}
             style={{
               display: 'flex',

@@ -24,7 +24,7 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
-const NeighbourWaste = ({ user }) => {
+const NeighbourWaste = ({ user, activeSubTab }) => {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
@@ -148,7 +148,8 @@ const NeighbourWaste = ({ user }) => {
             />
             <div className="nw-modal-actions">
               <button className="nw-modal-cancel" onClick={() => { setIsModalOpen(false); setTempWasteName(''); }}>Cancel</button>
-              <button className="nw-modal-submit" onClick={handleModalSubmit}>Capture Photo</button>
+              <button className="nw-modal-submit" onClick={handleModalSubmit}>Upload Photo</button>
+
             </div>
           </div>
         </div>
@@ -187,9 +188,9 @@ const NeighbourWaste = ({ user }) => {
                 ref={fileInputRef} 
                 style={{ display: 'none' }} 
                 accept="image/*" 
-                capture="environment"
                 onChange={handleFileChange}
               />
+
             </div>
           </div>
 

@@ -1,0 +1,410 @@
+/* AuthScreen.css - Cinematic Auth Interface */
+.auth-page {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: var(--surface);
+  z-index: 9999;
+  font-family: var(--font-body);
+}
+
+.auth-back-btn {
+
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  background: rgba(138, 235, 255, 0.05);
+  border: 1px solid rgba(138, 235, 255, 0.15);
+  border-radius: 99px;
+  color: #fff;
+  font-family: var(--font-headline);
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(10px);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.auth-back-btn:hover {
+  background: rgba(138, 235, 255, 0.15);
+  border-color: #8AEBFF;
+  transform: translateX(-5px);
+  box-shadow: 0 0 20px rgba(138, 235, 255, 0.2);
+}
+
+.auth-back-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+
+.auth-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 50%, rgba(138, 235, 255, 0.05) 0%, #020617 100%);
+}
+
+
+
+/* ──── Diagonally-split Panes ──── */
+.auth-pane {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  z-index: 1;
+}
+
+.auth-pane.login-pane {
+  background: #0B1120;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  transform: translateX(0);
+}
+
+.auth-pane.signup-pane {
+  background: #0F172A;
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  transform: translateX(0);
+  align-items: flex-end;
+  text-align: right;
+}
+
+/* Active State Shifts */
+.auth-container.signup-active .login-pane {
+  transform: translateX(-100%);
+}
+.auth-container.signup-active .signup-pane {
+  transform: translateX(0);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* full screen when active? */
+}
+
+/* ──── Refined Version: Sliding Overlay ──── */
+.auth-content-wrapper {
+  position: relative;
+  width: 1000px;
+  max-width: 95%;
+  height: 680px;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(138, 235, 255, 0.15);
+  border-radius: 32px;
+  overflow: hidden;
+  display: flex;
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(138, 235, 255, 0.05);
+}
+
+
+.auth-overlay {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  z-index: 10;
+  transition: transform 0.6s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  overflow: hidden;
+}
+
+.auth-container.signup-mode .auth-overlay {
+  transform: translateX(-100%);
+}
+
+.overlay-panel {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding: 60px;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay-left {
+  transform: translateX(-150%);
+}
+
+.auth-container.signup-mode .overlay-left {
+  transform: translateX(0);
+}
+
+.overlay-right {
+  transform: translateX(0);
+}
+
+.auth-container.signup-mode .overlay-right {
+  transform: translateX(150%);
+}
+
+
+/* ──── Forms ──── */
+.form-container {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 42px 60px;
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+
+
+.login-container {
+  left: 0;
+  z-index: 2;
+}
+
+.auth-container.signup-mode .login-container {
+  transform: translateX(100%);
+}
+
+.signup-container {
+  left: 0;
+  width: 50%;
+  opacity: 0;
+  z-index: 1;
+}
+
+.auth-container.signup-mode .signup-container {
+  transform: translateX(100%);
+  opacity: 1;
+  z-index: 5;
+}
+
+/* Animation refinement */
+.auth-container.signup-mode .login-container {
+  opacity: 0;
+}
+
+/* ──── UI Elements ──── */
+.auth-title {
+  font-family: var(--font-headline);
+  font-size: 46px;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 6px;
+  letter-spacing: -0.04em;
+}
+
+.auth-subtitle {
+  color: #64748B;
+  margin-bottom: 24px;
+  font-size: 15px;
+  line-height: 1.4;
+  font-weight: 500;
+}
+
+
+
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+.input-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(138, 235, 255, 0.5);
+  font-weight: 600;
+}
+
+.auth-input {
+  background: rgba(138, 235, 255, 0.03);
+  border: 1px solid rgba(138, 235, 255, 0.1);
+  padding: 16px 20px 16px 56px;
+  border-radius: 18px;
+  color: white;
+  outline: none;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 16px;
+  width: 100%;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 20px;
+  color: rgba(138, 235, 255, 0.3);
+  font-size: 22px;
+  pointer-events: none;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.auth-input:focus {
+  border-color: #8AEBFF;
+  background: rgba(138, 235, 255, 0.08);
+  box-shadow: 0 0 25px rgba(138, 235, 255, 0.15);
+}
+
+.auth-input:focus + .input-icon {
+  color: #8AEBFF;
+}
+
+
+.auth-btn {
+  margin-top: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+
+.primary-auth-btn {
+  background: linear-gradient(135deg, #8AEBFF 0%, #2DD4BF 100%);
+  color: #020617;
+  box-shadow: 0 4px 30px rgba(138, 235, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.primary-auth-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 10px 40px rgba(138, 235, 255, 0.4);
+}
+
+
+.google-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.google-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ghost-auth-btn {
+  background: transparent;
+  border: 1.5px solid rgba(138, 235, 255, 0.4);
+  color: #fff;
+  padding: 14px 40px;
+  margin-top: 24px;
+  backdrop-filter: blur(10px);
+}
+
+.ghost-auth-btn:hover {
+  background: #8AEBFF;
+  border-color: #8AEBFF;
+  color: #070D1F;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(138, 235, 255, 0.2);
+}
+
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: rgba(148, 163, 184, 0.4);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin: 12px 0;
+}
+
+
+
+/* ──── Parallax Decor ──── */
+.auth-bg-decor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+}
+
+.glow-1 {
+  width: 600px;
+  height: 600px;
+  background: #8AEBFF;
+  top: -200px;
+  right: -200px;
+  animation: move-1 20s infinite alternate;
+}
+
+.glow-2 {
+  width: 500px;
+  height: 500px;
+  background: #22D3EE;
+  bottom: -200px;
+  left: -200px;
+  animation: move-2 25s infinite alternate;
+}
+
+@keyframes move-1 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(-100px, 100px); }
+}
+
+@keyframes move-2 {
+  from { transform: translate(0, 0); }
+  to { transform: translate(100px, -100px); }
+}

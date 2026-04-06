@@ -48,12 +48,66 @@ export default {
         marquee: {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
-        }
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "slide-in-from-bottom": {
+          "0%": { transform: "translateY(1rem)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "slide-in-from-left": {
+          "0%": { transform: "translateX(-1rem)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "slide-in-from-right": {
+          "0%": { transform: "translateX(1rem)", opacity: "0" },
+          "100%": { transform: "translateX(0)", opacity: "1" },
+        },
+        "zoom-in": {
+          "0%": { transform: "scale(0.95)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
       },
       animation: {
         marquee: 'marquee 30s linear infinite',
+        "fade-in": "fade-in 0.5s ease-out forwards",
+        "slide-in-bottom": "slide-in-from-bottom 0.5s ease-out forwards",
+        "slide-in-left": "slide-in-from-left 0.5s ease-out forwards",
+        "slide-in-right": "slide-in-from-right 0.5s ease-out forwards",
+        "zoom-in": "zoom-in 0.3s ease-out forwards",
       }
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      addUtilities({
+        '.animate-in': {
+          'animation-play-state': 'running',
+        },
+        '.duration-700': {
+          'animation-duration': '700ms',
+        },
+        '.fade-in': {
+          'animation-name': 'fade-in',
+        },
+        '.slide-in-from-bottom-4': {
+          'animation-name': 'slide-in-from-bottom',
+        },
+        '.slide-in-from-left-5': {
+          'animation-name': 'slide-in-from-left',
+        },
+        '.slide-in-from-right-5': {
+          'animation-name': 'slide-in-from-right',
+        },
+        '.zoom-in-95': {
+          'animation-name': 'zoom-in',
+        },
+        '.mask-radial-gradient': {
+          'mask-image': 'radial-gradient(circle, black, transparent)',
+        },
+      })
+    }
+  ],
 }

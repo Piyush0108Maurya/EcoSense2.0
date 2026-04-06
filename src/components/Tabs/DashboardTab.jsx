@@ -1,216 +1,348 @@
 import React from 'react';
-import { DB } from '../../services/db';
+import { Doughnut, Bar } from 'react-chartjs-2';
+import './DashboardTab.css';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from 'chart.js';
 
-const DashboardTab = ({ activeSubTab }) => {
-  const user = DB.getUser();
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
+
+const DashboardTab = ({ activeSubTab, user }) => {
   if (!user) return null;
 
   const thresholds = [0, 500, 1500, 5000, 10000];
   const lvNames = ["Eco Seedling", "Eco Warrior", "Green Guardian", "Earth Protector", "Planet Champion"];
   const lvEmojis = ["🌱", "🌿", "🌳", "🌍", "⭐"];
 
-  const currentLevelArrIndex = thresholds.findLastIndex(t => user.points >= t) >= 0 ? thresholds.findLastIndex(t => user.points >= t) : 0;
-  const nextTarget = thresholds[currentLevelArrIndex + 1] || 10000;
-  const progressPercent = Math.min((user.points / nextTarget) * 100, 100);
+  const points = user.points || 0;
+  const currentLevelIndex = thresholds.findLastIndex(t => points >= t);
+  const nextTarget = thresholds[currentLevelIndex + 1] || 10000;
+  const progressPercent = Math.min((points / nextTarget) * 100, 100);
 
-  // Derive stats
-  const itemsClassified = user.history?.length || 0;
+  const joinDate = user.createdAt ? new Date(user.createdAt) : new Date();
+  const diffDays = Math.ceil(Math.abs(new Date() - joinDate) / (1000 * 60 * 60 * 24)) || 1;
+
+  const history = user.impactHistory || [];
   
-  // Calculate days active based on join history (just a rough calculation for realism)
-  const joinDate = new Date(user.joinDate);
-  const now = new Date();
-  const diffTime = Math.abs(now - joinDate);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(7, 13, 31, 0.9)',
+        titleColor: '#8AEBFF',
+        bodyColor: '#E8F4FD',
+        borderColor: 'rgba(138, 235, 255, 0.2)',
+        borderWidth: 1,
+        padding: 12,
+        cornerRadius: 8,
+        titleFont: { family: 'Space Grotesk', size: 14, weight: 'bold' },
+        bodyFont: { family: 'Inter', size: 12 },
+      }
+    },
+    scales: { y: { display: false }, x: { display: false } }
+  };
 
-  const renderOverview = () => {
-    return (
-      <section className="pt-8 pb-32 px-4 md:px-8 max-w-5xl mx-auto flex flex-col gap-6 animate-in fade-in zoom-in-95 duration-700 font-body">
+  const renderOverview = () => (
+    <div className="dashboard-content animate-in zoom-in-95">
+      
+      {/* ── PROFILE HERO ── */}
+      <div className="profile-hero">
+        <div className="profile-hero-glow"></div>
+        <div className="profile-hero-glow-alt"></div>
         
-        {/* Profile Card */}
-        <div className="bg-[#0f2b21]/80 backdrop-blur-md rounded-2xl p-7 flex flex-col md:flex-row items-center gap-6 border border-[#384c44]/40 shadow-2xl relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[80px] pointer-events-none rounded-full"></div>
-          
-          <div className="relative">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center font-headline font-bold text-4xl text-primary bg-gradient-to-br from-[#0f2b21] to-[#0a241c] border-[3px] border-primary/30 shadow-[0_0_25px_rgba(194,247,215,0.15)]">
-               {user.initials}
-            </div>
-            <div className="absolute -bottom-1 -right-1 bg-[#025d59] p-1.5 rounded-full border-4 border-[#01110b]">
-              <span className="material-symbols-outlined text-[16px] text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>verified</span>
+        <div className="avatar-wrapper">
+          <div className="avatar-inner">
+            <div className="avatar-box">
+               {user.initials || user.displayName?.slice(0, 2).toUpperCase()}
             </div>
           </div>
-          
-          <div className="flex-1 text-center md:text-left z-10">
-            <h1 className="font-headline font-bold text-3xl text-on-surface mb-1">{user.name}</h1>
-            <p className="font-body text-sm text-[#9ab0a6]">{user.email}</p>
-            <p className="font-body text-[13px] text-[#9ab0a6]/70 mt-1 italic">Vanguard member since {joinDate.toLocaleDateString()}</p>
-            <div className="inline-flex items-center gap-2 mt-4 bg-[#004643]/40 border border-primary/20 rounded-full px-4 py-1.5 shadow-[inset_0_0_10px_rgba(194,247,215,0.05)]">
-              <span className="font-headline font-semibold text-[13px] text-primary tracking-wide">
-                {lvEmojis[currentLevelArrIndex]} {user.level || lvNames[currentLevelArrIndex]}
-              </span>
-            </div>
+          <div className="verified-badge">
+             <span className="material-symbols-outlined" style={{ color: '#070D1F', fontSize: '20px', fontWeight: 'bold' }}>verified</span>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-[#0a241c] p-6 rounded-2xl border border-[#384c44]/30 text-center flex flex-col items-center shadow-lg transition-transform hover:-translate-y-1">
-            <span className="material-symbols-outlined text-primary mb-3 text-3xl">category</span>
-            <span className="font-headline font-bold text-3xl text-on-surface mb-1">{itemsClassified}</span>
-            <span className="font-label text-[10px] uppercase tracking-widest text-[#9ab0a6]">Items Classified</span>
+        <div className="profile-info-main">
+          <div className="profile-name-row">
+            <h1 className="profile-name-text">
+              {user.displayName || 'Guardian'}
+            </h1>
+            <span className="level-badge">
+              LEVEL {currentLevelIndex + 1}
+            </span>
           </div>
-          <div className="bg-[#0a241c] p-6 rounded-2xl border border-[#384c44]/30 text-center flex flex-col items-center shadow-lg transition-transform hover:-translate-y-1">
-            <span className="material-symbols-outlined text-primary mb-3 text-3xl">location_city</span>
-            <span className="font-headline font-bold text-3xl text-on-surface mb-1">4</span>
-            <span className="font-label text-[10px] uppercase tracking-widest text-[#9ab0a6]">Cities Scanned</span>
-          </div>
-          <div className="bg-[#0a241c] p-6 rounded-2xl border border-[#384c44]/30 text-center flex flex-col items-center shadow-lg transition-transform hover:-translate-y-1">
-            <span className="material-symbols-outlined text-[#efc680] mb-3 text-3xl" style={{ fontVariationSettings: "'FILL' 1" }}>stars</span>
-            <span className="font-headline font-bold text-3xl text-on-surface mb-1">{user.points.toLocaleString()}</span>
-            <span className="font-label text-[10px] uppercase tracking-widest text-[#9ab0a6]">Net Points</span>
-          </div>
-          <div className="bg-[#0a241c] p-6 rounded-2xl border border-[#384c44]/30 text-center flex flex-col items-center shadow-lg transition-transform hover:-translate-y-1">
-            <span className="material-symbols-outlined text-primary mb-3 text-3xl">calendar_today</span>
-            <span className="font-headline font-bold text-3xl text-on-surface mb-1">{diffDays}</span>
-            <span className="font-label text-[10px] uppercase tracking-widest text-[#9ab0a6]">Days Active</span>
+          <p className="profile-desc">
+            Environmental Vanguard designated since {joinDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}. 
+            Active in the {user.location || 'Global'} sector for {diffDays} cycles.
+          </p>
+          
+          <div className="profile-tags">
+             <div className="tag-pill primary-tag">
+                <span className="tag-text">{lvEmojis[currentLevelIndex]} {lvNames[currentLevelIndex].toUpperCase()}</span>
+             </div>
+             <div className="tag-pill secondary-tag">
+                <span className="tag-text">RANK #1,284</span>
+             </div>
           </div>
         </div>
 
-        {/* Eco Points Showcase */}
-        <div className="bg-gradient-to-b from-[#0f2b21] to-[#0a241c] rounded-2xl p-8 md:p-10 border border-[#384c44]/40 shadow-xl overflow-hidden relative">
-          
-          <div className="text-center mb-10 relative z-10">
-            <span className="font-label text-[11px] uppercase tracking-[0.3em] text-[#9ab0a6] block mb-3 font-semibold">Current Balance</span>
-            <h2 className="font-headline font-black text-6xl md:text-8xl text-[#efc680] drop-shadow-[0_0_20px_rgba(239,198,128,0.25)] tracking-tighter mb-4">{user.points.toLocaleString()}</h2>
-            <p className="font-body text-sm text-[#9ab0a6] bg-black/20 inline-block px-4 py-2 rounded-full border border-white/5">
-              Next tier unlocked in <span className="text-primary font-bold">{nextTarget - user.points} pts</span>
-            </p>
-          </div>
+        <div className="impact-score-card">
+           <span className="score-label">Impact Score</span>
+           <span className="score-value">{Math.round(points / 12)}</span>
+           <div className="score-progress-bg">
+              <div className="score-progress-fill" style={{ width: '65%' }}></div>
+           </div>
+        </div>
+      </div>
 
-          {/* Level progression track */}
-          <div className="relative h-28 mb-4 max-w-3xl mx-auto z-10">
-            <div className="absolute top-1/2 left-0 w-full h-1 bg-black/40 -translate-y-1/2 rounded-full border border-white/5"></div>
-            <div className="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-primary to-emerald-400 -translate-y-1/2 rounded-full z-10 shadow-[0_0_10px_#c2f7d7]" style={{ width: `${progressPercent}%`, transition: 'width 1s cubic-bezier(0.16, 1, 0.3, 1)' }}></div>
-            
-            <div className="flex justify-between items-center h-full relative z-20">
-              {thresholds.map((t, i) => {
-                 const reached = user.points >= t;
-                 const active = currentLevelArrIndex === i;
-                 return (
-                  <div key={i} className={`flex flex-col items-center gap-2 ${reached ? 'opacity-100' : 'opacity-40 grayscale'}`}>
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-500
-                       ${reached ? 'bg-[#0f2b21] border-primary shadow-[0_0_15px_rgba(194,247,215,0.3)]' : 'bg-[#031710] border-[#384c44]'}
-                       ${active && 'scale-125 bg-primary border-primary shadow-[0_0_20px_rgba(194,247,215,0.6)]'}
-                    `}>
-                      <span className={`material-symbols-outlined text-sm ${active ? 'text-[#01110b]' : reached ? 'text-primary' : 'text-[#9ab0a6]'}`} style={reached ? { fontVariationSettings: "'FILL' 1" } : {}}>
-                         {reached ? 'eco' : 'lock'}
-                      </span>
-                    </div>
-                    <div className="text-center absolute top-[70%] transform -translate-x-[0%]">
-                      <p className={`font-headline font-bold text-[11px] whitespace-nowrap mt-4 ${active ? 'text-primary' : reached ? 'text-[#e2f9ed]' : 'text-[#9ab0a6]'}`}>{lvEmojis[i]} {lvNames[i]}</p>
-                      <p className={`font-body text-[10px] ${reached ? 'text-primary/70' : 'text-[#9ab0a6]/50'}`}>{t.toLocaleString()} pts</p>
+      {/* ── CORE STATS GRID ── */}
+      <div className="dashboard-stats-grid">
+        {[
+          { label: 'Scans Logged', value: history.length, icon: 'qr_code_scanner', color: 'var(--primary)' },
+          { label: 'Matter Diverted', value: '42.5kg', icon: 'auto_delete', color: 'var(--secondary)' },
+          { label: 'Current Assets', value: points.toLocaleString(), icon: 'toll', color: '#F59E0B' },
+          { label: 'Active Cycles', value: diffDays, icon: 'update', color: '#EF4444' }
+        ].map((stat, i) => (
+          <div key={i} className="stat-card">
+             <div className="stat-icon-wrap">
+                <span className="material-symbols-outlined" style={{ fontSize: '24px', color: stat.color }}>{stat.icon}</span>
+                <span className="live-data-badge">Live data</span>
+             </div>
+             <span className="stat-value">{stat.value}</span>
+             <span className="stat-label">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* ── PROGRESSION MATRIX ── */}
+      <div className="matrix-layout-grid">
+        <div className="progression-matrix-card">
+           <div className="matrix-header">
+              <div>
+                <h3 className="matrix-title">Progression Matrix</h3>
+                <p className="matrix-subtitle">Distance to {lvNames[currentLevelIndex + 1] || 'Final Rank'}</p>
+              </div>
+              <div className="matrix-telemetry">
+                 <span className="telemetry-value">{points.toLocaleString()}</span>
+                 <span className="telemetry-label">Total Telemetry</span>
+              </div>
+           </div>
+
+           <div className="progression-track">
+              <div className="progression-bar-bg"></div>
+              <div className="progression-bar-fill" style={{ width: `${progressPercent}%` }}></div>
+              
+              <div className="progression-nodes">
+                {thresholds.map((t, i) => (
+                  <div key={i} className="progression-node">
+                    <div className={`node-dot ${points >= t ? 'active' : ''}`}></div>
+                    <div className="node-label-wrap">
+                       <span className={`node-rank ${points >= t ? 'text-white' : ''}`}>{lvNames[i].split(' ')[0]}</span>
+                       <span className="node-points">{t >= 1000 ? (t/1000)+'K' : t}</span>
                     </div>
                   </div>
-                 )
-              })}
-            </div>
-          </div>
+                ))}
+              </div>
+           </div>
+
+           <div className="acceleration-tip">
+              <div className="tip-icon-box">
+                 <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '20px' }}>rocket_launch</span>
+              </div>
+              <p className="tip-text">
+                You are outperforming <span className="text-primary">84%</span> of guardians in your sector. 
+                Complete <span className="text-bold">5 more classifications</span> to accelerate rank progression.
+              </p>
+           </div>
         </div>
 
-        {/* History & Tips Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Points History */}
-          <div className="bg-[#0f2b21]/60 rounded-2xl p-6 border border-[#384c44]/30">
-            <h3 className="font-headline font-bold text-sm uppercase tracking-widest text-[#9ab0a6] mb-5">Ledger</h3>
-            <div className="space-y-3">
-              {user.history?.slice(0, 5).map((h, i) => (
-                 <div key={i} className="flex items-center justify-between font-body text-sm bg-black/20 px-4 py-3 rounded-xl border border-white/5 hover:bg-black/30 transition-colors">
-                   <div className="flex flex-col">
-                     <span className="text-[#e2f9ed] font-medium">{h.item}</span>
-                     <span className="text-[10px] text-[#9ab0a6] uppercase tracking-wider mt-0.5">{new Date(h.date).toLocaleDateString()}</span>
-                   </div>
-                   <span className="text-primary font-headline font-bold bg-primary/10 px-3 py-1 rounded-full">{h.points > 0 ? '+' : ''}{h.points}</span>
+        <div className="impact-donut-card">
+            <span className="hub-label">Carbon Offset Hub</span>
+            <div className="hub-chart-container">
+              <div className="hub-chart-wrap">
+                <Doughnut 
+                  data={{
+                    labels: ['Scanned', 'Pending', 'Verified'],
+                    datasets: [{
+                      data: [65, 25, 10],
+                      backgroundColor: ['#8AEBFF', 'rgba(138, 235, 255, 0.2)', 'rgba(164, 214, 76, 0.4)'],
+                      borderWidth: 0,
+                      cutout: '85%'
+                    }]
+                  }}
+                  options={chartOptions}
+                />
+              </div>
+              <div className="impact-donut-inner">
+                 <span className="hub-value">12.4</span>
+                 <span className="hub-unit">Tons CO₂</span>
+              </div>
+            </div>
+            <p className="hub-desc">Estimated environmental impact based on your logged classifications.</p>
+            <button className="hub-report-btn">Download Report</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderEcoPoints = () => (
+    <div className="dashboard-content">
+      <div className="balance-hero">
+        <div className="hero-mesh"></div>
+        <span className="hero-label">Available Assets</span>
+        <h2 className="hero-value">{points.toLocaleString()}</h2>
+        <div className="hero-status">
+           <span className="status-dot"></span>
+           <span className="status-text">Verified in Protocol</span>
+        </div>
+      </div>
+
+      <div className="ledger-grid">
+         <div className="ledger-card">
+            <h3 className="ledger-title">
+              <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '20px' }}>receipt_long</span>
+              Recent Ledger
+            </h3>
+            <div className="ledger-list">
+               {history.length > 0 ? history.slice(0, 8).map((entry, i) => (
+                 <div key={i} className="ledger-item">
+                    <div className="item-meta">
+                       <div className="item-icon-box">
+                          <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '18px' }}>
+                             {entry.category === 'Recyclable' ? 'recycling' : entry.category === 'Hazardous' ? 'warning' : 'delete'}
+                          </span>
+                       </div>
+                       <div>
+                          <p className="item-name">{entry.item || 'Item Analysis'}</p>
+                          <p className="item-date">{new Date(entry.date).toLocaleDateString()}</p>
+                       </div>
+                    </div>
+                    <span className="item-points">+{entry.points}</span>
                  </div>
-              )) || <div className="text-sm text-[#9ab0a6] italic">No ledger entries detected.</div>}
+               )) : (
+                 <div className="ledger-empty">No entries.</div>
+               )}
             </div>
-          </div>
+         </div>
 
-          {/* How to earn points */}
-          <div className="flex flex-col gap-4">
-            <div className="bg-[#0a241c] rounded-2xl p-6 border border-[#384c44]/30">
-              <h3 className="font-headline font-semibold text-lg text-[#e2f9ed] mb-5">Earn Telemetry Points</h3>
-              <ul className="space-y-4">
-                <li className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center transition-colors">
-                    <span className="material-symbols-outlined text-primary text-xl">recycling</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-body text-sm text-[#e2f9ed] font-medium">Classify Unknown Matter</p>
-                    <p className="text-[11px] text-[#9ab0a6] mt-0.5">+5 to 25 pts per successful scan</p>
-                  </div>
-                </li>
-                <li className="flex items-center gap-4 group">
-                  <div className="w-10 h-10 rounded-full bg-[#efc680]/10 group-hover:bg-[#efc680]/20 flex items-center justify-center transition-colors">
-                    <span className="material-symbols-outlined text-[#efc680] text-xl">login</span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-body text-sm text-[#e2f9ed] font-medium">Connection Bonus</p>
-                    <p className="text-[11px] text-[#9ab0a6] mt-0.5">+10 pts per daily network sync</p>
-                  </div>
-                </li>
-              </ul>
+         <div className="distribution-card">
+            <h3 className="ledger-title">
+              <span className="material-symbols-outlined" style={{ color: 'var(--secondary)', fontSize: '20px' }}>analytics</span>
+              Asset Distribution
+            </h3>
+            <div className="chart-canvas-wrap">
+               <Bar 
+                 data={{
+                   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                   datasets: [{
+                     label: 'Points',
+                     data: [120, 450, 300, 600, 200, 800, 350],
+                     backgroundColor: '#8AEBFF',
+                     borderRadius: 4
+                   }]
+                 }}
+                 options={{
+                    ...chartOptions,
+                    scales: {
+                       y: { display: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8FA8BF', font: { size: 9 } } },
+                       x: { display: true, grid: { display: false }, ticks: { color: '#8FA8BF', font: { size: 9 } } }
+                    }
+                 }}
+               />
             </div>
+         </div>
+      </div>
+    </div>
+  );
 
-            <button className="w-full flex items-center justify-center gap-3 bg-primary/10 hover:bg-primary/20 border border-primary/20 rounded-2xl py-5 transition-all duration-300 active:scale-[0.98]">
-              <span className="material-symbols-outlined text-primary">share</span>
-              <span className="font-headline font-bold text-[#e2f9ed] tracking-wide">Share EcoSense <span className="text-primary font-black ml-1">+50 PTS</span></span>
-            </button>
+  const renderActivity = () => (
+    <div className="dashboard-content">
+       <div className="activity-card">
+          <div className="activity-header">
+             <h3 className="ledger-title">Activity Stream</h3>
+             <span className="live-status-pill">Live</span>
           </div>
-        </div>
-
-      </section>
-    );
-  };
-
-  const renderSettings = () => {
-    return (
-      <section className="pt-8 pb-32 px-4 max-w-lg mx-auto flex flex-col gap-6 animate-in fade-in">
-        <div className="bg-[#0f2b21]/80 rounded-2xl p-8 border border-[#384c44]/40 shadow-xl">
-          <h2 className="font-headline text-2xl font-bold text-white mb-6">System Preferences</h2>
           
-          <div className="space-y-5">
-            <div>
-              <label className="block font-label text-[10px] uppercase tracking-widest text-[#9ab0a6] mb-2 pl-1">Display Designation</label>
-              <input type="text" readOnly value={user.name} className="w-full bg-[#031710] border border-[#384c44]/50 rounded-xl px-4 py-3 text-[#e2f9ed] opacity-80" />
-            </div>
-            <div>
-              <label className="block font-label text-[10px] uppercase tracking-widest text-[#9ab0a6] mb-2 pl-1">Network Identity</label>
-              <input type="text" readOnly value={user.email} className="w-full bg-[#031710] border border-[#384c44]/50 rounded-xl px-4 py-3 text-[#e2f9ed] opacity-80" />
-            </div>
-
-            <hr className="border-[#384c44]/30 my-6" />
-
-            <div className="p-4 rounded-xl border border-error/20 bg-error/5">
-              <h3 className="font-headline font-semibold text-error mb-1">Purge Local Matrix</h3>
-              <p className="font-body text-xs text-[#9ab0a6] mb-4">Warning: This will permanently eradicate all local progression, points, and history.</p>
-              <button 
-                className="w-full bg-error text-white font-label font-bold uppercase tracking-widest text-xs py-3 rounded-xl hover:bg-[#ff5564] transition-colors"
-                onClick={() => { if(confirm('Eradicate all local telemetry?')) { localStorage.clear(); window.location.reload(); } }}
-              >
-                Initiate Purge
-              </button>
-            </div>
+          <div className="table-overflow">
+             {history.length > 0 ? (
+                <table className="activity-table">
+                   <thead>
+                      <tr>
+                         <th>Timestamp</th>
+                         <th>Designation</th>
+                         <th>Yield</th>
+                         <th>Status</th>
+                      </tr>
+                   </thead>
+                   <tbody>
+                      {history.map((entry, i) => (
+                         <tr key={i}>
+                            <td>{new Date(entry.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</td>
+                            <td>
+                               <div className="td-item">
+                                  <span className="material-symbols-outlined" style={{ fontSize: '14px', color: 'var(--primary)' }}>science</span>
+                                  <span>{entry.item || 'Generic Analysis'}</span>
+                               </div>
+                            </td>
+                            <td><span className="yield-val">+{entry.points}</span></td>
+                            <td><span className="status-pill-verified">Verified</span></td>
+                         </tr>
+                      ))}
+                   </tbody>
+                </table>
+             ) : (
+                <div className="ledger-empty" style={{ padding: '6rem' }}>No telemetry detected.</div>
+             )}
           </div>
-        </div>
-      </section>
-    );
-  };
+       </div>
+    </div>
+  );
+
+  const renderSettings = () => (
+    <div className="dashboard-content" style={{ maxWidth: '36rem' }}>
+       <div className="settings-card">
+          <h2 className="matrix-title" style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+             <span className="material-symbols-outlined" style={{ color: 'var(--primary)' }}>settings_applications</span>
+             Vanguard Settings
+          </h2>
+          
+          <div className="settings-form">
+             <div className="form-group">
+                <label className="form-label">Guardian Designation</label>
+                <input readOnly value={user.displayName || ''} className="form-input" />
+             </div>
+
+             <div className="form-group">
+                <label className="form-label">Network Identity</label>
+                <input readOnly value={user.email || ''} className="form-input muted-input" />
+             </div>
+
+             <div className="form-footer">
+                <button 
+                  onClick={() => { if(confirm('Initiate terminal purge?')) { localStorage.clear(); window.location.reload(); } }}
+                  className="purge-button"
+                >
+                   Initiate Purge
+                </button>
+             </div>
+          </div>
+       </div>
+    </div>
+  );
 
   return (
-    <div className="w-full">
+    <div className="dashboard-container">
       {activeSubTab === 0 && renderOverview()}
-      {activeSubTab === 1 && renderOverview()} {/* Map points tab back to overview as it's consolidated */}
-      {activeSubTab === 2 && renderOverview()} {/* Map activity tab back to overview */}
+      {activeSubTab === 1 && renderEcoPoints()}
+      {activeSubTab === 2 && renderActivity()}
       {activeSubTab === 3 && renderSettings()}
     </div>
   );

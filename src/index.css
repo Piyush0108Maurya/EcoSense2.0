@@ -52,6 +52,10 @@
 
 @layer utilities {}
 
+@import './components/Tabs/AQI.css';
+@import './components/Tabs/WasteGuide.css';
+@import './components/Tabs/DashboardTab.css';
+
 @layer components {
 
   /* These are required to keep the rest of the application not completely broken while we migrate */
@@ -69,5 +73,41 @@
     border: 1px solid rgba(138, 235, 255, 0.2);
     border-radius: 0.125rem;
     font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Global Animations */
+  @keyframes particle-drift {
+    0% { transform: translateY(100vh) scale(1); opacity: 0; }
+    50% { opacity: 0.2; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+  }
+
+  .particle {
+    animation: particle-drift linear infinite;
+    background: var(--primary);
+  }
+
+  .particles-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* Status Bars & Progress */
+  .glass-nav-pill {
+    animation: nav-slide-down 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes nav-slide-down {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .points-progress-bar {
+    background: rgba(138, 235, 255, 0.05);
+    border-top: 1px solid rgba(138, 235, 255, 0.1);
+    backdrop-filter: blur(4px);
   }
 }
