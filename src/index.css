@@ -1,0 +1,61 @@
+/* EcoSense — Techno-Oceanic design tokens (Surface-Lowest base) */
+
+:root {
+  --color-primary: #8aebff;
+  --color-primary-mid: #56d9f0;
+  --color-primary-container: #22d3ee;
+  --color-secondary: #a4d64c;
+  --color-secondary-bright: #bef264;
+
+  --surface-lowest: #070d1f;
+  --surface-dim: #0c1222;
+  --surface-container: #191f31;
+  --surface-highest: #2e3447;
+  --surface-field: #12182a;
+
+  --outline-variant: rgba(255, 255, 255, 0.55);
+  --text-primary: rgba(232, 238, 252, 0.94);
+  --text-muted: rgba(200, 210, 230, 0.72);
+
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-sm: 0.125rem;
+  --radius-panel: 0.5rem;
+  --radius-max: 0.75rem;
+
+  --blur-glass: 28px;
+
+  --space-asym-l: clamp(1.75rem, 5vw, 4.5rem);
+  --space-asym-r: clamp(1rem, 3vw, 2rem);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+  background-color: var(--surface-lowest);
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--outline-variant) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--outline-variant) 5%, transparent) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+
+#root {
+  min-height: 100svh;
+}
