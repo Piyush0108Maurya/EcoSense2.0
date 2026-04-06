@@ -1,61 +1,73 @@
-/* EcoSense — Techno-Oceanic design tokens (Surface-Lowest base) */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --color-primary: #8aebff;
-  --color-primary-mid: #56d9f0;
-  --color-primary-container: #22d3ee;
-  --color-secondary: #a4d64c;
-  --color-secondary-bright: #bef264;
+  /* ══ Techno-Oceanic: Abyssal Command Design System ══ */
 
-  --surface-lowest: #070d1f;
-  --surface-dim: #0c1222;
-  --surface-container: #191f31;
-  --surface-highest: #2e3447;
-  --surface-field: #12182a;
+  /* Primary: Oxygen Cyan */
+  --primary: #8AEBFF;
+  --primary-dim: rgba(138, 235, 255, 0.12);
+  --primary-glow: rgba(138, 235, 255, 0.35);
+  --primary-active: #22D3EE;
 
-  --outline-variant: rgba(255, 255, 255, 0.55);
-  --text-primary: rgba(232, 238, 252, 0.94);
-  --text-muted: rgba(200, 210, 230, 0.72);
+  /* Secondary: Bioluminescent Lime */
+  --secondary: #A4D64C;
+  --secondary-dim: rgba(164, 214, 76, 0.12);
 
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
+  /* Surfaces: Deep-Trench Hierarchy */
+  --surface:          #070D1F;   /* Deep Trench */
+  --surface-card:     #191F31;   /* Mission Deck */
+  --surface-elevated: #2E3447;   /* Instrument Panel */
 
-  --radius-sm: 0.125rem;
-  --radius-panel: 0.5rem;
-  --radius-max: 0.75rem;
+  /* Text */
+  --on-surface: #E8F4FD;
+  --on-surface-muted: #8FA8BF;
 
-  --blur-glass: 28px;
+  /* Borders */
+  --border-subtle: rgba(138, 235, 255, 0.06);
+  --border-active: rgba(138, 235, 255, 0.18);
 
-  --space-asym-l: clamp(1.75rem, 5vw, 4.5rem);
-  --space-asym-r: clamp(1rem, 3vw, 2rem);
+  /* Typography */
+  --font-headline: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+@layer base {
+  body {
+    background-color: var(--surface);
+    color: var(--on-surface);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--primary);
+    color: var(--surface);
+  }
 }
 
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+@layer utilities {}
 
-body {
-  margin: 0;
-  min-height: 100svh;
-  font-family: var(--font-body);
-  font-size: 0.875rem;
-  line-height: 1.55;
-  color: var(--text-muted);
-  background-color: var(--surface-lowest);
-  background-image:
-    linear-gradient(color-mix(in srgb, var(--outline-variant) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--outline-variant) 5%, transparent) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-position: -1px -1px;
-}
+@layer components {
 
-#root {
-  min-height: 100svh;
+  /* These are required to keep the rest of the application not completely broken while we migrate */
+  .btn-solid {
+    @apply font-bold font-headline py-2 px-5 border-none cursor-pointer inline-flex items-center justify-center;
+    background: linear-gradient(135deg, #8AEBFF, #22D3EE);
+    color: #070D1F;
+    border-radius: 0.125rem;
+    box-shadow: 0 0 12px rgba(138, 235, 255, 0.15);
+  }
+
+  .btn-ghost {
+    @apply bg-transparent font-medium text-sm py-2 px-4 cursor-pointer inline-flex items-center justify-center;
+    color: #8AEBFF;
+    border: 1px solid rgba(138, 235, 255, 0.2);
+    border-radius: 0.125rem;
+    font-family: 'Space Grotesk', sans-serif;
+  }
 }

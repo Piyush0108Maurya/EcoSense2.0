@@ -1,0 +1,200 @@
+.wg-tech-grid {
+  background-image: radial-gradient(rgba(138, 235, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.wg-glass-panel {
+  background: rgba(7, 13, 31, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(138, 235, 255, 0.08);
+}
+
+/* Local Lumi Styles */
+@keyframes lumi-bobbing {
+
+  0%,
+  100% {
+    transform: translateY(0)
+  }
+
+  50% {
+    transform: translateY(-8px)
+  }
+}
+
+@keyframes lumi-sway {
+
+  0%,
+  100% {
+    transform: rotate(-10deg)
+  }
+
+  50% {
+    transform: rotate(10deg)
+  }
+}
+
+@keyframes lumi-blink {
+
+  0%,
+  90%,
+  100% {
+    transform: scaleY(1)
+  }
+
+  95% {
+    transform: scaleY(0.1)
+  }
+}
+
+@keyframes lumi-wave {
+
+  0%,
+  100% {
+    transform: rotate(-5deg)
+  }
+
+  50% {
+    transform: rotate(15deg)
+  }
+}
+
+@keyframes lumi-orbit {
+  from {
+    transform: rotate(0deg) translateX(36px) rotate(0deg)
+  }
+
+  to {
+    transform: rotate(360deg) translateX(36px) rotate(-360deg)
+  }
+}
+
+.wg-lumi-spirit {
+  animation: lumi-bobbing 3s ease-in-out infinite;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wg-lumi-face {
+  width: 56px;
+  height: 56px;
+  background: radial-gradient(circle at center, #0a1835, #070D1F);
+  border: 1.5px solid rgba(138, 235, 255, 0.4);
+  box-shadow: 0 0 15px rgba(138, 235, 255, 0.2);
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+}
+
+.wg-lumi-crown {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+  z-index: 3;
+}
+
+.wg-leaf {
+  width: 12px;
+  height: 18px;
+  background: #8AEBFF;
+  border-radius: 100% 0 100% 0;
+  animation: lumi-sway 2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.wg-leaf:nth-child(2) {
+  height: 22px;
+  animation-delay: 0.2s;
+}
+
+.wg-leaf:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.wg-lumi-eyes {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+}
+
+.wg-eye {
+  width: 8px;
+  height: 4px;
+  background: #8AEBFF;
+  border-radius: 50% 50% 50% 50%/100% 100% 0 0;
+  box-shadow: 0 0 8px #8AEBFF;
+  animation: lumi-blink 4s infinite;
+}
+
+.wg-lumi-arm {
+  position: absolute;
+  width: 20px;
+  height: 4px;
+  background: #1D2438;
+  border-radius: 4px;
+  top: 35px;
+  animation: lumi-wave 2.5s ease-in-out infinite;
+}
+
+.wg-lumi-arm-left {
+  left: -5px;
+  transform-origin: right center;
+}
+
+.wg-lumi-arm-right {
+  right: -5px;
+  transform-origin: left center;
+  animation-direction: reverse;
+}
+
+.wg-particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #8AEBFF;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #8AEBFF;
+  animation: lumi-orbit 4s linear infinite;
+}
+
+.wg-p1 {
+  animation-delay: 0s
+}
+
+.wg-p2 {
+  animation-delay: -1s
+}
+
+.wg-p3 {
+  animation-delay: -2s
+}
+
+.wg-p4 {
+  animation-delay: -3s
+}
+
+.result-card {
+  animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

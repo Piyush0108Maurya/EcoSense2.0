@@ -1,0 +1,252 @@
+.ls-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: var(--font-headline);
+  color: var(--on-surface);
+  transition: opacity 0.8s cubic-bezier(0.85, 0, 0.15, 1), transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.ls-finish {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+/* Background Elements */
+.ls-background {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(circle at center, #071530 0%, var(--surface) 100%);
+}
+
+.ls-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.ls-glow-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--primary);
+  top: -100px;
+  left: -100px;
+  animation: glow-float 15s infinite alternate ease-in-out;
+}
+
+.ls-glow-2 {
+  width: 600px;
+  height: 600px;
+  background: #1a2a4a;
+  bottom: -200px;
+  right: -200px;
+  animation: glow-float 20s infinite alternate-reverse ease-in-out;
+}
+
+.ls-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(138, 235, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(138, 235, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.5;
+}
+
+@keyframes glow-float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, 100px) scale(1.2); }
+  100% { transform: translate(-50px, -50px) scale(0.9); }
+}
+
+/* Content Container */
+.ls-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  max-width: 320px;
+  width: 100%;
+}
+
+/* Visual: Ring & Icon */
+.ls-visual {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ls-ring-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.ls-svg {
+  transform: rotate(-90deg);
+  width: 100%;
+  height: 100%;
+}
+
+.ls-circle-bg {
+  stroke: rgba(138, 235, 255, 0.06);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+.ls-circle-progress {
+  stroke: var(--primary);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 283; /* 2 * pi * 45 */
+  transition: stroke-dashoffset 0.1s linear;
+  filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+.ls-center-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ls-center-icon span {
+  font-size: 56px;
+  color: var(--primary);
+  filter: drop-shadow(0 0 12px var(--primary-glow));
+  animation: eco-pulse 3s infinite ease-in-out;
+}
+
+@keyframes eco-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px var(--primary)); }
+}
+
+/* Orbiting Particles */
+.ls-orbit {
+  position: absolute;
+  inset: 0;
+  animation: orbit 10s infinite linear;
+}
+
+.ls-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: var(--primary);
+  border-radius: 50%;
+  filter: blur(1px) drop-shadow(0 0 4px var(--primary));
+}
+
+.p1 { top: 10%; left: 50%; animation: p1-blink 4s infinite; }
+.p2 { bottom: 20%; right: 10%; opacity: 0.6; }
+.p3 { top: 40%; left: 5%; opacity: 0.4; }
+
+@keyframes orbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes p1-blink {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+}
+
+/* Text Block */
+.ls-text-block {
+  text-align: center;
+  width: 100%;
+  animation: fade-up 1s ease-out;
+}
+
+.ls-percentage {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--on-surface);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  letter-spacing: -2px;
+}
+
+.ls-phrase {
+  font-size: 0.75rem;
+  color: var(--on-surface-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 1.5rem;
+  min-height: 1.2rem;
+}
+
+.ls-bar-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(138, 235, 255, 0.06);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.ls-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  background-size: 200% 100%;
+  animation: bar-shimmer 2s infinite linear;
+  transition: width 0.2s linear;
+}
+
+@keyframes bar-shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 100% 0; }
+}
+
+/* Brand Footer */
+.ls-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  opacity: 0.6;
+}
+
+.ls-logo-mark {
+  position: relative;
+  width: 20px;
+  height: 20px;
+}
+
+.mark-leaf {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 0 100% 0 100%;
+  background: var(--primary);
+}
+
+.mark-leaf.l1 { transform: rotate(15deg); }
+.mark-leaf.l2 { transform: rotate(195deg); top: 8px; left: 8px; opacity: 0.5; }
+
+.ls-brand-name {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,1197 @@
+/* ============================================
+   AQI DASHBOARD — ANIMATED PROFESSIONAL REDESIGN
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── ROOT TOKENS ── */
+:root {
+  /* ── AQI: Abyssal Command Tokens ── */
+  --aqi-bg:         #070D1F;
+  --aqi-surface:    #191F31;
+  --aqi-border:     rgba(138, 235, 255, 0.07);
+  --aqi-border-hov: rgba(138, 235, 255, 0.18);
+  --aqi-text:       #E8F4FD;
+  --aqi-muted:      #8FA8BF;
+  --aqi-subtle:     #2E3447;
+  --aqi-radius:     12px;
+  --aqi-radius-lg:  16px;
+  --aqi-transition: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── PAGE ── */
+.aqi-page {
+  min-height: 100vh;
+  background: var(--aqi-bg);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--aqi-text);
+}
+
+.aqi-page-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* ── CARDS ── */
+.aqi-card {
+  background: var(--aqi-surface);
+  border: 1px solid var(--aqi-border);
+  border-radius: var(--aqi-radius);
+  transition: border-color var(--aqi-transition), transform var(--aqi-transition), box-shadow var(--aqi-transition);
+}
+
+.aqi-card:hover {
+  border-color: var(--aqi-border-hov);
+}
+
+.aqi-card-lg {
+  border-radius: var(--aqi-radius-lg);
+}
+
+/* ── HERO CARD ── */
+.aqi-hero {
+  padding: 40px 48px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 32px;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.aqi-hero-glow {
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  opacity: 0.07;
+  pointer-events: none;
+  transition: background 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: blur(100px);
+  animation: aqi-glow-breathe 6s ease-in-out infinite alternate;
+}
+
+@keyframes aqi-glow-breathe {
+  from {
+    opacity: 0.05;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0.10;
+    transform: scale(1.15);
+  }
+}
+
+.aqi-hero-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── LIVE PULSE DOT ── */
+.aqi-location-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+}
+
+.aqi-dot-live {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8AEBFF;
+  animation: aqi-live-pulse 2.5s cubic-bezier(0.66, 0, 0, 1) infinite;
+}
+
+@keyframes aqi-live-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(138, 235, 255, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(138, 235, 255, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(138, 235, 255, 0);
+  }
+}
+
+.aqi-location-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--aqi-muted);
+  letter-spacing: 0.01em;
+}
+
+/* ── CITY NAME ── */
+.aqi-city-name {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 700;
+  line-height: 1.05;
+  color: var(--aqi-text);
+  letter-spacing: -0.03em;
+  margin: 0;
+  /* Shimmer reveal on first paint */
+  animation: aqi-text-reveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes aqi-text-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.aqi-city-tip {
+  font-size: 14px;
+  color: var(--aqi-muted);
+  line-height: 1.6;
+  max-width: 440px;
+}
+
+/* ── STATUS BADGE ── */
+.aqi-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid;
+  font-size: 12px;
+  font-weight: 600;
+  width: fit-content;
+  letter-spacing: 0.02em;
+  transition: all 0.5s ease;
+  animation: aqi-badge-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+@keyframes aqi-badge-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── GAUGE ── */
+.aqi-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  animation: aqi-gauge-enter 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+}
+
+@keyframes aqi-gauge-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.85) rotate(-8deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+.aqi-gauge {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.aqi-gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.aqi-gauge-track {
+  fill: none;
+  stroke: var(--aqi-subtle);
+  stroke-width: 6;
+}
+
+.aqi-gauge-fill {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1.6s cubic-bezier(0.4, 0, 0.2, 1),
+    stroke 0.6s ease;
+}
+
+/* Outer ring pulse */
+.aqi-gauge::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid;
+  border-color: inherit;
+  opacity: 0;
+  animation: aqi-ring-pulse 3.5s ease-out infinite;
+}
+
+@keyframes aqi-ring-pulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(0.97);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+
+.aqi-gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.aqi-gauge-num {
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  transition: color 0.6s ease;
+}
+
+.aqi-gauge-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--aqi-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── CITY SWITCHER ── */
+.aqi-city-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.aqi-city-chip {
+  padding: 8px 18px;
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--aqi-border);
+  background: transparent;
+  color: var(--aqi-muted);
+  cursor: pointer;
+  transition: all var(--aqi-transition);
+  white-space: nowrap;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.aqi-city-chip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.2s;
+}
+
+.aqi-city-chip:hover {
+  border-color: var(--aqi-border-hov);
+  color: var(--aqi-text);
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.aqi-city-chip:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.aqi-city-chip.active {
+  color: #070D1F;
+  background: linear-gradient(135deg, #8AEBFF, #22D3EE);
+  border-color: transparent;
+  font-weight: 600;
+  transform: none;
+  box-shadow: 0 0 12px rgba(138, 235, 255, 0.25);
+}
+
+/* ── SECTION HEADER ── */
+.aqi-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.aqi-section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--aqi-text);
+  margin: 0;
+}
+
+.aqi-section-sub {
+  font-size: 12px;
+  color: var(--aqi-muted);
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+}
+
+/* ── POLLUTANT CARDS ── */
+.aqi-pollutant-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.aqi-pollutant-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.aqi-pollutant-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.aqi-pollutant-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.aqi-pollutant-name {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--aqi-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.aqi-pollutant-status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  letter-spacing: 0.03em;
+  transition: all 0.4s ease;
+}
+
+.aqi-pollutant-value {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  transition: color 0.4s ease;
+}
+
+.aqi-pollutant-unit {
+  font-size: 11px;
+  color: var(--aqi-muted);
+  font-weight: 400;
+  margin-left: 3px;
+}
+
+/* ── PROGRESS BAR ── */
+.aqi-progress-bar {
+  height: 4px;
+  background: var(--aqi-subtle);
+  border-radius: 100px;
+  overflow: hidden;
+}
+
+.aqi-progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  width: 0%;
+  transition: width 1.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── CHART ── */
+.aqi-chart-card {
+  padding: 28px 32px;
+  transition: border-color var(--aqi-transition);
+}
+
+/* ── WEATHER STAT CARDS ── */
+.aqi-weather-stat {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  padding: 18px 20px;
+  transition: transform var(--aqi-transition), box-shadow var(--aqi-transition), border-color var(--aqi-transition);
+}
+
+.aqi-weather-stat:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+}
+
+.aqi-weather-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+
+.aqi-weather-stat:hover .aqi-weather-icon {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── LOADING STATE ── */
+.aqi-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 480px;
+  gap: 16px;
+}
+
+.aqi-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--aqi-subtle);
+  border-top-color: #8AEBFF;
+  border-radius: 50%;
+  animation: aqi-spin 0.7s linear infinite;
+}
+
+@keyframes aqi-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.aqi-loading-text {
+  font-size: 13px;
+  color: var(--aqi-muted);
+  letter-spacing: 0.03em;
+  animation: aqi-blink 2s ease-in-out infinite;
+}
+
+@keyframes aqi-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ── SKELETON SHIMMER ── */
+.aqi-skeleton {
+  background: linear-gradient(90deg, var(--aqi-surface) 25%, #1e2642 50%, var(--aqi-surface) 75%);
+  background-size: 200% 100%;
+  animation: aqi-shimmer 1.8s infinite;
+  border-radius: 8px;
+}
+
+@keyframes aqi-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ── ERROR STATE ── */
+.aqi-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  text-align: center;
+  padding: 32px;
+}
+
+.aqi-error-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FF5252;
+  animation: aqi-shake 0.5s ease;
+}
+
+@keyframes aqi-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20% {
+    transform: translateX(-6px);
+  }
+
+  40% {
+    transform: translateX(6px);
+  }
+
+  60% {
+    transform: translateX(-4px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.aqi-error-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--aqi-text);
+  margin: 0;
+}
+
+.aqi-error-sub {
+  font-size: 13px;
+  color: var(--aqi-muted);
+  margin: 0;
+}
+
+.aqi-retry-btn {
+  padding: 9px 20px;
+  border-radius: 8px;
+  background: var(--aqi-surface);
+  border: 1px solid var(--aqi-border-hov);
+  color: var(--aqi-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--aqi-transition);
+  margin-top: 4px;
+}
+
+.aqi-retry-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+}
+
+/* ── FORECAST DAY CARDS ── */
+.aqi-forecast-day {
+  padding: 22px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform var(--aqi-transition), border-color var(--aqi-transition), box-shadow var(--aqi-transition);
+}
+
+.aqi-forecast-day:hover {
+  transform: translateY(-5px);
+  border-color: var(--aqi-border-hov);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.aqi-forecast-weekday {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--aqi-muted);
+}
+
+.aqi-forecast-score {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  transition: color 0.4s;
+}
+
+.aqi-forecast-label {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.4s;
+}
+
+/* ── HEALTH TIP CARDS ── */
+.aqi-tip-card {
+  padding: 28px;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  transition: transform var(--aqi-transition), border-color var(--aqi-transition), box-shadow var(--aqi-transition);
+  cursor: default;
+}
+
+.aqi-tip-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--aqi-border-hov);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.aqi-tip-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.aqi-tip-card:hover .aqi-tip-icon {
+  transform: scale(1.12) rotate(-4deg);
+}
+
+.aqi-tip-icon .material-symbols-outlined {
+  font-size: 22px;
+  font-variation-settings: 'FILL' 0, 'wght' 400;
+}
+
+.aqi-tip-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--aqi-text);
+  margin: 0 0 6px 0;
+}
+
+.aqi-tip-body {
+  font-size: 13px;
+  color: var(--aqi-muted);
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* ── GRID HELPERS ── */
+.aqi-grid-2-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.aqi-col-2 {
+  grid-column: span 2;
+}
+
+/* ── DIVIDER ── */
+.aqi-divider {
+  height: 1px;
+  background: var(--aqi-border);
+  border: none;
+  margin: 0;
+}
+
+/* ── AQI SCALE ── */
+.aqi-scale-bar {
+  display: flex;
+  height: 6px;
+  border-radius: 100px;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.aqi-scale-segment {
+  flex: 1;
+  border-radius: 100px;
+  transition: opacity 0.5s ease;
+}
+
+/* ── EMPTY STATE ── */
+.aqi-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 12px;
+  text-align: center;
+}
+
+.aqi-empty-icon {
+  font-size: 40px;
+  color: var(--aqi-muted);
+  opacity: 0.4;
+}
+
+.aqi-empty-title {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--aqi-text);
+  margin: 0;
+}
+
+.aqi-empty-sub {
+  font-size: 13px;
+  color: var(--aqi-muted);
+  max-width: 380px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.aqi-sync-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 100px;
+  background: var(--aqi-surface);
+  border: 1px solid var(--aqi-border);
+  font-size: 12px;
+  color: var(--aqi-muted);
+  letter-spacing: 0.04em;
+  margin-top: 12px;
+}
+
+/* ── TICKER / MARQUEE ── */
+.aqi-ticker {
+  overflow: hidden;
+  border-top: 1px solid var(--aqi-border);
+  border-bottom: 1px solid var(--aqi-border);
+  background: rgba(25, 31, 49, 0.6);
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.aqi-ticker-track {
+  display: flex;
+  gap: 0;
+  animation: aqi-ticker-scroll 28s linear infinite;
+  white-space: nowrap;
+}
+
+.aqi-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes aqi-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.aqi-ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 28px;
+  font-size: 11.5px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--aqi-muted);
+  border-right: 1px solid var(--aqi-border);
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.aqi-ticker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── PAGE TRANSITION ── */
+.aqi-view-enter {
+  animation: aqi-view-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes aqi-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── STAGGERED ANIMATIONS ── */
+.aqi-animate-in {
+  animation: aqiFadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes aqiFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.aqi-stagger-1 {
+  animation-delay: 0.05s;
+}
+
+.aqi-stagger-2 {
+  animation-delay: 0.10s;
+}
+
+.aqi-stagger-3 {
+  animation-delay: 0.15s;
+}
+
+.aqi-stagger-4 {
+  animation-delay: 0.20s;
+}
+
+.aqi-stagger-5 {
+  animation-delay: 0.25s;
+}
+
+.aqi-stagger-6 {
+  animation-delay: 0.30s;
+}
+
+.aqi-stagger-7 {
+  animation-delay: 0.35s;
+}
+
+/* ── SCROLLBAR ── */
+.aqi-city-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.aqi-city-bar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   POLLUTANT CARDS — Reference image style
+   Dark card · Colored left border · Cloud icon · Full name · Big value · Arrow
+══════════════════════════════════════════════════════════════════════════════ */
+
+/* Grid: 3 columns, 2 rows */
+.aqi-pol-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+/* Card shell */
+.aqi-pol-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #0E1428;
+  border: 1px solid rgba(138, 235, 255, 0.07);
+  border-radius: 10px;
+  padding: 16px 14px 16px 20px;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background 250ms ease,
+    border-color 250ms ease,
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 250ms ease;
+}
+
+.aqi-pol-card:hover {
+  background: #151C30;
+  border-color: rgba(138, 235, 255, 0.16);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+.aqi-pol-card:active {
+  transform: translateY(0) scale(0.99);
+}
+
+/* Colored left accent bar — like the green/yellow bars in the reference */
+.aqi-pol-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 12px 0 0 12px;
+  transition: background 0.4s ease;
+}
+
+
+/* Cloud icon container */
+.aqi-pol-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.aqi-pol-card:hover .aqi-pol-icon {
+  transform: scale(1.1);
+}
+
+/* Text label */
+.aqi-pol-label {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.aqi-pol-fullname {
+  font-size: 13px;
+  font-weight: 600;
+  color: #C8E0F2;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aqi-pol-sub {
+  font-size: 11px;
+  color: #8FA8BF;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 400;
+}
+
+/* Value block — right-aligned */
+.aqi-pol-value-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.aqi-pol-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.4s;
+}
+
+.aqi-pol-unit {
+  font-size: 10px;
+  color: #8FA8BF;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 3px;
+  letter-spacing: 0.02em;
+}
+
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .aqi-grid-2-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aqi-col-2 {
+    grid-column: span 2;
+  }
+
+  .aqi-pol-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .aqi-hero {
+    grid-template-columns: 1fr;
+    padding: 28px 24px;
+  }
+
+  .aqi-hero-glow {
+    display: none;
+  }
+
+  .aqi-gauge-wrap {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .aqi-gauge {
+    width: 140px;
+    height: 140px;
+  }
+
+  .aqi-gauge-num {
+    font-size: 40px;
+  }
+
+  .aqi-pollutant-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .aqi-pol-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .aqi-pol-value {
+    font-size: 22px;
+  }
+
+  .aqi-pol-fullname {
+    font-size: 12px;
+  }
+
+  .aqi-grid-2-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .aqi-col-2 {
+    grid-column: span 1;
+  }
+
+  .aqi-chart-card {
+    padding: 20px;
+  }
+
+  .aqi-tip-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .aqi-page-inner {
+    padding: 20px 16px 80px;
+  }
+
+  .aqi-city-name {
+    font-size: 32px;
+  }
+
+  .aqi-pol-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .aqi-pol-card {
+    padding: 13px 10px 13px 16px;
+    gap: 10px;
+  }
+
+  .aqi-pol-value {
+    font-size: 20px;
+  }
+}
+
+.aqi-diet-item:hover {
+  background: rgba(138, 235, 255, 0.06);
+  border-color: rgba(138, 235, 255, 0.18) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.aqi-tip-card {
+  padding: 24px;
+}
+
+/* Advanced Health UI */
+.aqi-health-hero {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.aqi-health-hero::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, var(--glow-color, rgba(255, 255, 255, 0.03)) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.aqi-diet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.aqi-diet-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.aqi-diet-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.aqi-health-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.aqi-diet-card:hover .aqi-health-icon-box {
+  transform: scale(1.1) rotate(5deg);
+}
