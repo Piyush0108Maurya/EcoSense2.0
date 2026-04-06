@@ -263,7 +263,7 @@ const pm25ToAQI = (pm25) => {
 /* ══════════════════════════════════════════════════════════════════════════════
    MAIN COMPONENT
 ══════════════════════════════════════════════════════════════════════════════ */
-const AQI = ({ activeSubTab }) => {
+const AQI = ({ activeSubTab, onPointsUpdate }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -349,6 +349,9 @@ const AQI = ({ activeSubTab }) => {
       // Update ticker entry for this city
       const key = CITY_KEYS[cityName] || target.toLowerCase();
       setTickerData(prev => ({ ...prev, [key]: waqiRes.aqi }));
+
+      // Award points for checking AQI
+      if (onPointsUpdate) onPointsUpdate('AQI_CHECK', { city: cityName, aqi: waqiRes.aqi });
     } catch (err) {
       console.error("AQI Load Error:", err);
       setError('Could not load air quality data. Please try again.');

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { askGemini } from '../../services/api';
 import './LumiChat.css';
 
-const LumiChat = () => {
+const LumiChat = ({ onPointsUpdate }) => {
   const [messages, setMessages] = useState([
     {
       role: 'model',
@@ -70,10 +70,11 @@ const LumiChat = () => {
       const reply = await askGemini(systemPrompt, textToSend, chatHistory);
 
       setMessages(prev => [...prev, {
-        role: 'model',
-        text: reply,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
+      
+      // Award points for AI interaction
+      if (onPointsUpdate) onPointsUpdate('CHAT_INSIGHT');
     } catch (error) {
       console.error("Lumi AI error:", error);
       setMessages(prev => [...prev, {

@@ -24,7 +24,7 @@ function ChangeView({ center, zoom }) {
   return null;
 }
 
-const NeighbourWaste = ({ user, activeSubTab }) => {
+const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
   const [pins, setPins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
@@ -104,6 +104,7 @@ const NeighbourWaste = ({ user, activeSubTab }) => {
         });
 
         alert("Waste reported successfully! 🌿");
+        if (onPointsUpdate) onPointsUpdate('WASTE_PIN');
         setTempWasteName('');
         fetchPins();
         setMapCenter([lat, lng]);

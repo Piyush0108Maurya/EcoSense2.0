@@ -1,245 +1,234 @@
-import React, { useState } from 'react';
-import { askGemini } from '../../services/api';
-import { addPoints } from '../../services/firebase';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { WASTE_CATEGORIES, getNearestCollectors, reverseGeocode } from '../../services/collectors';
 import { DB } from '../../services/db';
 import './WasteGuide.css';
 
-const WasteGuide = ({ onPointsUpdate, user, activeSubTab }) => {
-  const [input, setInput] = useState('');
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleClassify = async (item = input) => {
-    if (!item.trim()) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
-
-    const systemPrompt = `You are EcoBot, India's expert waste classification AI. Respond ONLY with a valid JSON object. Exact format:
-    {
-      "category": "Recyclable" | "Compostable" | "Hazardous" | "Dry Waste" | "Wet Waste" | "E-Waste",
-      "color": "hex color (#5AB87A green, #E07C4A orange, #C94F4F red, #7AB8D4 blue)",
-      "emoji": "single emoji matching the item",
-      "confidence": integer (85-99),
-      "tip": "one-sentence disposal tip for India",
-      "dos": ["action1", "action2"], "donts": ["avoid1", "avoid2"],
-      "ecoPoints": integer (5-25),
-      "funFact": "surprising environmental fact string"
-    }`;
-
-    try {
-      const raw = await askGemini(systemPrompt, `Classify this waste item for India: ${item}`);
-      const clean = raw.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(clean);
-      setResult({ ...parsed, itemName: item });
-
-      if (user?.uid) {
-        await addPoints(user.uid, parsed.ecoPoints);
-      }
-
-      DB.addHistory(item, parsed);
-
-      if (onPointsUpdate) onPointsUpdate(parsed.ecoPoints, `Classified ${item}! 🌿`);
-    } catch (err) {
-      setError("Lumi needs a fresh breath of air 🌿 Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+/* ── Minimal Proximity Hub ────────────────────────── */
+const ProximityHub = ({ km }) => {
+  const isNear = km < 10;
+  const isExtreme = km > 100;
+  let status = 'Mid-Range'; let color = '#22D3EE';
+  if (isNear) { status = 'Local Spot'; color = '#5AB87A'; }
+  if (isExtreme) { status = 'Extreme Reach'; color = '#F97316'; }
 
   return (
-    <div className="ecosort-container">
-      <div className="ecosort-glow-top"></div>
-      <div className="ecosort-glow-bottom"></div>
+    <div className="wg-prox-hub" style={{ '--hub-color': color }}>
+      <div className="wg-prox-bar">
+        <div className="wg-prox-fill" style={{ width: `${Math.min((km/120)*100, 100)}%` }} />
+      </div>
+      <div className="wg-prox-meta">
+        <span className="wg-prox-status">{status}</span>
+        <span className="wg-prox-val">{km} <span>km</span></span>
+      </div>
+    </div>
+  );
+};
 
-      <section className="ecosort-section">
-        <div className="flex flex-col gap-12">
+const WasteGuide = ({ onPointsUpdate }) => {
+  const [location, setLocation]           = useState(null);
+  const [cityName, setCityName]           = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [collectors, setCollectors]       = useState([]);
+  const [locLoading, setLocLoading]       = useState(false);
+  const [locError, setLocError]           = useState(null);
+  const [contacted, setContacted]         = useState(new Set());
+  const [isMenuOpen, setIsMenuOpen]       = useState(false);
+  
+  const menuRef = useRef(null);
 
-          {/* ── TOP SECTION: SEARCH & HEADER ── */}
-          <div className="ecosort-header">
-            <header className="space-y-4">
-              <div className="module-badge">
-                <span className="module-badge-dot"></span>
-                <span className="module-badge-text">Intelligent Sorting Module</span>
-              </div>
-              <h1 className="ecosort-title">
-                Eco<span>Sort</span>
-              </h1>
-              <p className="ecosort-subtitle">
-                Harnessing AI to decode waste complexity. Type any object to receive instant disposal protocols.
-              </p>
-            </header>
+  const detectLocation = useCallback(() => {
+    if (!navigator.geolocation) { setLocError('Geolocation not supported.'); return; }
+    setLocLoading(true); setLocError(null);
 
-            {/* Search Area */}
-            <div className="search-wrapper">
-              <div className="search-glow"></div>
-              <div className="search-bar shadow-xl">
-                <span className="material-symbols-outlined ml-6 text-on-surface-variant/40">search</span>
-                <input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleClassify()}
-                  disabled={loading}
-                  className="search-input"
-                  placeholder="Analyze object (e.g., Lithium Battery, Tetrapak)..."
-                />
-                <button
-                  disabled={loading}
-                  onClick={() => handleClassify()}
-                  className="search-button"
-                >
-                  {loading ? 'Processing...' : 'Analyze'}
-                </button>
-              </div>
-            </div>
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        setLocation(coords);
+        const city = await reverseGeocode(coords);
+        setCityName(city);
+        if (selectedCategory) setCollectors(getNearestCollectors(coords, selectedCategory));
+        setTimeout(() => setLocLoading(false), 1500); 
+      },
+      (err) => { setLocLoading(false); setLocError('Location access denied.'); },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+    );
+  }, [selectedCategory]);
 
-            {/* Example Chips */}
-            <div className="flex flex-wrap gap-2 items-center justify-center">
-              <span className="text-on-surface-variant font-label text-xs mr-2">Quick lookup:</span>
-              {["Pizza box", "Coffee cup", "AA Battery", "LED Bulb", "Banana peel", "Old phone"].map(item => (
-                <button
-                  key={item}
-                  onClick={() => { setInput(item); handleClassify(item); }}
-                  className="chip shadow-sm"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
+  const handleCategorySelect = (catId) => {
+    setSelectedCategory(catId); setIsMenuOpen(false);
+    if (location) setCollectors(getNearestCollectors(location, catId));
+    else detectLocation();
+  };
 
-            {error && <div className="p-4 bg-error/10 border border-error/20 rounded-2xl text-error text-sm">{error}</div>}
+  const handleContacted = (collector) => {
+    if (contacted.has(collector.id)) return;
+    setContacted(prev => new Set([...prev, collector.id]));
+    if (onPointsUpdate) onPointsUpdate('CONTACT_HUB', { name: collector.name });
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setIsMenuOpen(false); };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const activeCat = WASTE_CATEGORIES.find(c => c.id === selectedCategory);
+
+  return (
+    <div className="wg-root" id="waste-guide-root">
+      <div className="wg-glow wg-glow-1" />
+      <div className="wg-glow wg-glow-2" />
+      <div className="wg-grid-overlay" />
+
+      <section className="wg-section">
+        
+        {/* ── PREMIUM CENTERED HERO ── */}
+        <div className="wg-hero-premium">
+          <div className="wg-brand-stack">
+            <div className="wg-badge-mini">🌍 Environment Dashboard</div>
+            <h1 className="wg-title-premium">
+              Eco<span>Sort</span>
+            </h1>
           </div>
 
-          {/* ── MAIN CONTENT GRID ── */}
-          <div className="ecosort-grid">
-
-            {/* LEFT: RESULTS OR INTRO */}
-            <div className="space-y-8">
-              {result ? (
-                /* RESULT CARD */
-                <div className="result-card-container">
-                    {/* Header */}
-                    <div className="result-header">
-                      <div className="flex items-center gap-6">
-                        <div className="result-icon-box" style={{ backgroundColor: `${result.color}15`, borderColor: `${result.color}30` }}>
-                          <span className="material-symbols-outlined text-5xl" style={{ color: result.color }}>
-                            {result.category === 'Recyclable' ? 'recycling' : result.category === 'Compostable' ? 'compost' : result.category === 'Hazardous' ? 'warning' : result.category === 'E-Waste' ? 'devices' : result.category === 'Wet Waste' ? 'water_drop' : 'delete'}
-                          </span>
-                        </div>
-                        <div className="text-left">
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">Classified Object</span>
-                            <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: result.color, boxShadow: `0 0 10px ${result.color}` }}></span>
-                          </div>
-                          <h2 className="text-4xl font-headline font-black text-on-surface uppercase tracking-tight">{result.itemName}</h2>
-                          <p className="text-primary font-bold text-sm tracking-widest uppercase mt-1">{result.category}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="ai-precision-box">
-                        <div className="text-[10px] font-bold text-on-surface-variant/40 uppercase tracking-[0.2em] mb-2">AI Precision</div>
-                        <div className="flex items-center gap-4">
-                          <div className="w-32 h-1 bg-surface-container-highest rounded-full overflow-hidden">
-                            <div className="h-full bg-primary" style={{ width: `${result.confidence}%` }}></div>
-                          </div>
-                          <span className="text-xl font-headline font-black text-primary">{result.confidence}%</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-8 md:p-12 pt-0 grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="protocol-box border-primary/20 bg-primary/5">
-                        <div className="flex items-center gap-3 text-primary">
-                          <span className="material-symbols-outlined">verified</span>
-                          <span className="font-bold text-xs uppercase tracking-widest">Protocols</span>
-                        </div>
-                        <ul className="space-y-3">
-                          {result.dos.map((d, i) => (
-                            <li key={i} className="flex items-center gap-3 text-sm text-on-surface/80">
-                              <span className="w-1 h-1 bg-primary rounded-full"></span> {d}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="protocol-box border-error/20 bg-error/5">
-                        <div className="flex items-center gap-3 text-error">
-                          <span className="material-symbols-outlined">dangerous</span>
-                          <span className="font-bold text-xs uppercase tracking-widest">Restrictions</span>
-                        </div>
-                        <ul className="space-y-3">
-                          {result.donts.map((d, i) => (
-                            <li key={i} className="flex items-center gap-3 text-sm text-on-surface/80">
-                              <span className="w-1 h-1 bg-error rounded-full"></span> {d}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div className="result-footer">
-                      <div className="credits-badge">
-                        <div className="credits-circle">E</div>
-                        <div className="text-left">
-                          <div className="text-xl font-headline font-black text-on-surface">+{result.ecoPoints} CREDITS</div>
-                          <div className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest">Added to synchronization</div>
-                        </div>
-                      </div>
-                      <button onClick={() => setResult(null)} className="px-8 py-3 bg-surface-container-highest hover:bg-surface-bright border border-white/5 rounded-xl text-sm font-bold transition-all uppercase tracking-widest text-on-surface-variant">Dismiss</button>
-                    </div>
+          <div className="wg-control-group">
+            <div className="wg-location-scanner-v4">
+              {locLoading ? (
+                <div className="wg-radar-bar">
+                  <div className="wg-radar-sweep-bar" />
+                  <span className="wg-radar-text-mini">SEARCHING SATELLITE...</span>
                 </div>
               ) : (
-                /* EMPTY STATE */
-                <div className="p-12 border border-dashed border-white/10 rounded-[40px] flex flex-col items-center text-center space-y-6 bg-surface-container/20">
-                  <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center">
-                    <span className="material-symbols-outlined text-4xl text-on-surface-variant/20">bubble_chart</span>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-2xl font-headline font-bold text-on-surface uppercase tracking-tight">System Idle</h3>
-                    <p className="text-on-surface-variant max-w-sm">Awaiting input for real-time waste decomposition. Lumi core is ready for analysis.</p>
-                  </div>
+                <div className={`wg-loc-tile-v4 ${location ? 'located' : ''}`}>
+                  {location ? (
+                    <div className="wg-loc-found-v4 anim-pop-in">
+                      <div className="wg-loc-city-wrap">
+                        <div className="wg-loc-indicator"><span className="dot" /></div>
+                        <div className="wg-loc-content">
+                          <h3 className="city-label">{cityName || 'Unknown City'}</h3>
+                          <span className="coords-label">{location.lat.toFixed(4)}, {location.lon.toFixed(4)}</span>
+                        </div>
+                      </div>
+                      <button className="wg-refresh-mini" onClick={detectLocation} title="Refresh Location">
+                        <span className="material-symbols-outlined">refresh</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button className="wg-btn-detect-v4" onClick={detectLocation}>
+                      <span className="material-symbols-outlined">my_location</span>
+                      <span>Detect Position</span>
+                    </button>
+                  )}
                 </div>
               )}
             </div>
 
-            {/* RIGHT: SIDEBAR */}
-            <div className="space-y-8">
-              <div className="sidebar-card">
-                <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-on-surface-variant/60">Protocols</h3>
-                <div className="space-y-4">
-                  {[
-                    { label: 'Wet Waste', color: '#8AEBFF', bin: 'Ocean' },
-                    { label: 'Dry Waste', color: '#22D3EE', bin: 'Blue' },
-                    { label: 'Hazardous', color: '#FF4D4D', bin: 'Red' },
-                    { label: 'E-Waste', color: '#B0B0B0', bin: 'Black' }
-                  ].map((cat, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/5 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color, boxShadow: `0 0 10px ${cat.color}` }}></div>
-                        <span className="text-sm font-bold text-on-surface-variant">{cat.label}</span>
+            <div className={`wg-selector-v4 ${isMenuOpen ? 'portal-active' : ''}`} ref={menuRef}>
+              <button className={`wg-menu-trigger-v4 ${selectedCategory ? 'has-selection' : ''}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <div className="wg-menu-trigger-content-v4">
+                  <span className="material-symbols-outlined">{activeCat ? activeCat.icon : 'category'}</span>
+                  <span className="label-text">{activeCat ? activeCat.label : 'Select Waste Type'}</span>
+                </div>
+                <span className={`material-symbols-outlined arrow ${isMenuOpen ? 'open' : ''}`}>expand_more</span>
+              </button>
+
+              {isMenuOpen && (
+                <div className="wg-menu-dropdown-v4 anim-slide-down">
+                  <div className="wg-menu-scroll">
+                    <div className="wg-menu-grid">
+                      {WASTE_CATEGORIES.map(cat => (
+                        <button key={cat.id} className={`wg-menu-item-v4 ${selectedCategory === cat.id ? 'active' : ''}`} onClick={() => handleCategorySelect(cat.id)}>
+                          <div className="wg-menu-item-icon-v4" style={{ color: cat.color }}><span className="material-symbols-outlined">{cat.icon}</span></div>
+                          <span className="wg-menu-item-label-v4">{cat.label}</span>
+                          <span className="wg-menu-item-emoji-v4">{cat.emoji}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {locError && <div className="wg-error-banner-v3">{locError}</div>}
+
+        {/* ── LUXURY RESULTS AREA ── */}
+        <div className="wg-main-display">
+          {selectedCategory ? (
+            <div className="wg-results-wrap">
+              <div className="wg-results-top">
+                <div className="wg-results-count"><span className="material-symbols-outlined">auto_awesome</span> Found {collectors.length} High-Ranked Collectors</div>
+              </div>
+
+              {location && collectors.length > 0 && (
+                <div className="wg-collector-grid-v5">
+                  {collectors.map((c, i) => (
+                    <div key={c.id} className={`wg-card-v5 ${contacted.has(c.id) ? 'contacted' : ''}`} style={{ '--idx': i, '--prox-color': c.distanceKm < 10 ? '#5AB87A' : (c.distanceKm > 100 ? '#F97316' : '#22D3EE') }}>
+                      
+                      <div className="wg-card-v5-inner">
+                        <div className="wg-card-v5-glow" />
+                        
+                        <div className="wg-card-v5-header">
+                          <div className="wg-card-v5-brand">
+                            <div className="wg-card-v5-avatar"><span className="material-symbols-outlined">recycling</span></div>
+                            <div className="wg-card-v5-names">
+                              <h3 className="collector-name">{c.name}</h3>
+                              <span className="collector-city">{c.city}</span>
+                            </div>
+                          </div>
+                          <div className="wg-card-v5-stats">
+                            <div className="wg-card-v5-rating"><span className="material-symbols-outlined">star</span> {c.rating}</div>
+                            {c.verified && <div className="wg-card-v5-verified" title="Verified Expert"><span className="material-symbols-outlined">verified</span></div>}
+                          </div>
+                        </div>
+
+                        <ProximityHub km={c.distanceKm} />
+
+                        <div className="wg-card-v5-info">
+                          <div className="info-item"><span className="material-symbols-outlined">map</span> <span>{c.address}</span></div>
+                          <div className="info-item"><span className="material-symbols-outlined">schedule</span> <span>{c.timings}</span></div>
+                        </div>
+
+                        <div className="wg-card-v5-actions">
+                          <a href={`tel:${c.phone}`} className="wg-card-v5-btn-call" onClick={() => handleContacted(c)}>
+                            <span className="material-symbols-outlined">call</span>
+                            <span>{c.phone}</span>
+                          </a>
+                          <button className={`wg-card-v5-btn-done ${contacted.has(c.id) ? 'active' : ''}`} onClick={() => handleContacted(c)}>
+                            <span className="material-symbols-outlined">{contacted.has(c.id) ? 'check_circle' : 'handshake'}</span>
+                          </button>
+                        </div>
                       </div>
-                      <span className="text-[10px] font-bold text-on-surface-variant/40 bg-surface-container-low px-3 py-1 rounded-full uppercase">{cat.bin}</span>
+
+                      {contacted.has(c.id) && (
+                        <div className="wg-card-v5-overlay-done">
+                          <span className="material-symbols-outlined">verified</span>
+                          <p>Met & Secured +10 XP</p>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
-              </div>
+              )}
 
-              <div className="impact-card-gradient">
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform duration-700">
-                  <span className="material-symbols-outlined text-8xl">eco</span>
-                </div>
-                <div className="relative z-10 space-y-6 text-left">
-                  <div className="text-[10px] font-bold text-primary uppercase tracking-[0.3em]">Week Impact</div>
-                  <div>
-                    <div className="text-5xl font-headline font-black text-on-surface">{user?.history?.reduce((acc, curr) => acc + curr.points, 0) || 0}</div>
-                    <div className="text-xs font-bold text-on-surface-variant mt-1 uppercase tracking-widest">Global Synchronization</div>
-                  </div>
-                  <button className="w-full py-3 bg-primary text-surface rounded-xl font-headline font-black uppercase text-xs tracking-widest shadow-lg">View Reports</button>
-                </div>
+              {location && collectors.length === 0 && (
+                <div className="wg-empty-shelf"><span className="material-symbols-outlined">query_stats</span><p>No hubs found for this type in your area.</p></div>
+              )}
+            </div>
+          ) : (
+            <div className="wg-idle-v3">
+              <div className="wg-orb-stack">
+                <div className="wg-orb-core-v3" />
+                <div className="wg-orb-ring-v3 r1" />
+                <div className="wg-orb-ring-v3 r2" />
+              </div>
+              <div className="wg-idle-text-v3">
+                <h2>Ready to Recycle?</h2>
+                <p>Choose a material to pinpoint verified collectors across the country.</p>
               </div>
             </div>
-
-          </div>
+          )}
         </div>
       </section>
     </div>

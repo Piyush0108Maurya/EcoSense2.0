@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getLevel } from './services/db';
-import { auth, logout, getUserStats } from './services/firebase';
+import { DB } from './services/db';
+import { auth, logout, getUserStats, addActivityPoints } from './services/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import SideNav from './components/common/SideNav';
 import Particles from './components/common/Particles';
@@ -34,20 +34,18 @@ function App() {
       if (firebaseUser) {
         // Fetch additional stats from Firestore
         const stats = await getUserStats(firebaseUser.uid);
-        const points = stats?.points || 0;
         
-        setUser({
-          uid: firebaseUser.uid,
-          displayName: stats?.displayName || firebaseUser.displayName || 'Eco Guardian',
-          email: firebaseUser.email,
-          photoURL: firebaseUser.photoURL,
-          points: points,
-          level: getLevel(points),
-          initials: (stats?.displayName || firebaseUser.displayName || 'EG').split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
-        });
+        if (stats) {
+          setUser(stats);
+          DB.saveUser(stats);
+          
+          // Trigger Daily Check-in automatically
+          handlePointsUpdate('DAILY_CHECKIN');
+        }
         setIsLandingView(false); // Move into app if logged in
       } else {
         setUser(null);
+        DB.logout();
       }
       setIsAuthReady(true);
     });
@@ -75,19 +73,35 @@ function App() {
     }
   };
 
-  const handlePointsUpdate = (pts, message) => {
-    if (pts) setToast({ points: pts, message });
-    // In a real app we would call addPoints(user.uid, pts) here
-    // For now we update local state
-    setUser(prev => {
-      if (!prev) return prev;
-      const newPoints = (prev.points || 0) + pts;
-      return {
-        ...prev,
-        points: newPoints,
-        level: getLevel(newPoints)
-      };
-    });
+  /**
+   * CENTRALIZED GAMIFIED POINT HANDLER
+   * Handles Local UI updates and Firestore Sync
+   */
+  const handlePointsUpdate = async (activityType, metadata = {}) => {
+    if (!user) return;
+    
+    // 1. Instant UI Feedback (Local Proxy)
+    const result = DB.applyActivityXP(activityType, metadata);
+    if (result) {
+      setUser({ ...result.user });
+      setToast({ points: result.addedXP, message: result.label });
+      console.log(`[EcoSense Gamification] Activity: ${activityType} | XP: +${result.addedXP}`);
+    }
+
+    // 2. Cloud Synchronization
+    try {
+      const cloudRes = await addActivityPoints(user.uid, activityType, metadata);
+      if (cloudRes && cloudRes.isNewDay) {
+        // Refresh local user to get the new streak from cloud
+        const freshStats = await getUserStats(user.uid);
+        if (freshStats) {
+          setUser(freshStats);
+          DB.saveUser(freshStats);
+        }
+      }
+    } catch (err) {
+      console.warn("Gamification Sync Failed:", err);
+    }
   };
 
   // If loading, show splash
@@ -122,24 +136,26 @@ function App() {
 
       {/* ── MAIN CONTENT ── */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', position: 'relative', paddingBottom: '80px' }}>
-        <StatusBars
-          activeTab={activeTab}
-          activeSubTab={activeSubTab}
-          setActiveSubTab={setActiveSubTab}
-          user={user}
-        />
+        {activeTab !== 'neighbour' && activeTab !== 'waste' && (
+          <StatusBars
+            activeTab={activeTab}
+            activeSubTab={activeSubTab}
+            setActiveSubTab={setActiveSubTab}
+            user={user}
+          />
+        )}
 
         <PointsProgress user={user} />
 
-        <div className="view-panel" style={{ paddingTop: '72px' }}>
-          {(activeTab === 'aqi') && <AQI activeSubTab={activeSubTab} />}
+        <div className="view-panel" style={{ paddingTop: (activeTab === 'neighbour' || activeTab === 'waste') ? '0' : '72px' }}>
+          {(activeTab === 'aqi') && <AQI activeSubTab={activeSubTab} onPointsUpdate={handlePointsUpdate} />}
           {activeTab === 'waste' && <WasteGuide onPointsUpdate={handlePointsUpdate} activeSubTab={activeSubTab} user={user} />}
-          {activeTab === 'neighbour' && <NeighbourWaste activeSubTab={activeSubTab} user={user} />}
+          {activeTab === 'neighbour' && <NeighbourWaste activeSubTab={activeSubTab} user={user} onPointsUpdate={handlePointsUpdate} />}
           {activeTab === 'dashboard' && <DashboardTab activeSubTab={activeSubTab} user={user} />}
         </div>
 
         {/* Floating Lumi Spirit */}
-        <LumiSpirit isSidebarExpanded={sidebarExpanded} />
+        <LumiSpirit isSidebarExpanded={sidebarExpanded} onPointsUpdate={handlePointsUpdate} />
       </div>
 
       {showLogoutModal && (

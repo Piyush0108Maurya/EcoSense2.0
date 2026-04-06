@@ -1,6 +1,5 @@
 import React from 'react';
 import { Doughnut, Bar } from 'react-chartjs-2';
-import './DashboardTab.css';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -11,26 +10,46 @@ import {
   BarElement,
   Title,
 } from 'chart.js';
+import { getLevelInfo, calculateImpact } from '../../services/gamification';
+import './DashboardTab.css';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 const DashboardTab = ({ activeSubTab, user }) => {
   if (!user) return null;
 
-  const thresholds = [0, 500, 1500, 5000, 10000];
-  const lvNames = ["Eco Seedling", "Eco Warrior", "Green Guardian", "Earth Protector", "Planet Champion"];
-  const lvEmojis = ["🌱", "🌿", "🌳", "🌍", "⭐"];
-
   const points = user.points || 0;
-  const currentLevelIndex = thresholds.findLastIndex(t => points >= t);
-  const nextTarget = thresholds[currentLevelIndex + 1] || 10000;
-  const progressPercent = Math.min((points / nextTarget) * 100, 100);
+  const level = getLevelInfo(points);
+  const impact = calculateImpact(points);
 
   const joinDate = user.createdAt ? new Date(user.createdAt) : new Date();
   const diffDays = Math.ceil(Math.abs(new Date() - joinDate) / (1000 * 60 * 60 * 24)) || 1;
 
   const history = user.impactHistory || [];
+
+  // Calculate Weekly Distribution for Bar Chart
+  const last7Days = [...Array(7)].map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    return d.toDateString();
+  }).reverse();
+
+  const weeklyData = last7Days.map(dateStr => {
+    return history
+      .filter(item => new Date(item.date).toDateString() === dateStr)
+      .reduce((sum, item) => sum + (item.points || 0), 0);
+  });
+
+  // Calculate Category Distribution for Doughnut Chart
+  const catCounts = history.reduce((acc, item) => {
+    const type = item.type || 'OTHER';
+    acc[type] = (acc[type] || 0) + 1;
+    return acc;
+  }, {});
   
+  const doughnutLabels = Object.keys(catCounts).length > 0 ? Object.keys(catCounts).slice(0, 3) : ['Scanned', 'Verified', 'Pending'];
+  const doughnutValues = Object.keys(catCounts).length > 0 ? Object.values(catCounts).slice(0, 3) : [65, 25, 10];
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
@@ -76,7 +95,7 @@ const DashboardTab = ({ activeSubTab, user }) => {
               {user.displayName || 'Guardian'}
             </h1>
             <span className="level-badge">
-              LEVEL {currentLevelIndex + 1}
+              GEN {level.label.split(' ')[2] ? '6' : '1'}
             </span>
           </div>
           <p className="profile-desc">
@@ -86,19 +105,19 @@ const DashboardTab = ({ activeSubTab, user }) => {
           
           <div className="profile-tags">
              <div className="tag-pill primary-tag">
-                <span className="tag-text">{lvEmojis[currentLevelIndex]} {lvNames[currentLevelIndex].toUpperCase()}</span>
+                <span className="tag-text">{level.label.toUpperCase()}</span>
              </div>
-             <div className="tag-pill secondary-tag">
-                <span className="tag-text">RANK #1,284</span>
+             <div className="tag-pill secondary-tag" style={{ background: 'rgba(245, 158, 11, 0.1)', color: '#F59E0B' }}>
+                <span className="tag-text">RANK #{Math.max(1, 4500 - Math.floor(points / 2)).toLocaleString()}</span>
              </div>
           </div>
         </div>
 
         <div className="impact-score-card">
-           <span className="score-label">Impact Score</span>
-           <span className="score-value">{Math.round(points / 12)}</span>
+           <span className="score-label">Global Impact Score</span>
+           <span className="score-value">{Math.floor(points / 10)}</span>
            <div className="score-progress-bg">
-              <div className="score-progress-fill" style={{ width: '65%' }}></div>
+              <div className="score-progress-fill" style={{ width: `${level.progress}%`, background: level.color }}></div>
            </div>
         </div>
       </div>
@@ -106,10 +125,10 @@ const DashboardTab = ({ activeSubTab, user }) => {
       {/* ── CORE STATS GRID ── */}
       <div className="dashboard-stats-grid">
         {[
-          { label: 'Scans Logged', value: history.length, icon: 'qr_code_scanner', color: 'var(--primary)' },
-          { label: 'Matter Diverted', value: '42.5kg', icon: 'auto_delete', color: 'var(--secondary)' },
-          { label: 'Current Assets', value: points.toLocaleString(), icon: 'toll', color: '#F59E0B' },
-          { label: 'Active Cycles', value: diffDays, icon: 'update', color: '#EF4444' }
+          { label: 'Intelligence Log', value: history.length, icon: 'qr_code_scanner', color: 'var(--primary)' },
+          { label: 'CO₂ Diverted', value: `${impact.co2Saved}kg`, icon: 'auto_delete', color: 'var(--secondary)' },
+          { label: 'Eco Assets', value: points.toLocaleString(), icon: 'toll', color: '#F59E0B' },
+          { label: 'Active Streak', value: `${user.streak || 1} Days`, icon: 'update', color: '#EF4444' }
         ].map((stat, i) => (
           <div key={i} className="stat-card">
              <div className="stat-icon-wrap">
@@ -128,7 +147,7 @@ const DashboardTab = ({ activeSubTab, user }) => {
            <div className="matrix-header">
               <div>
                 <h3 className="matrix-title">Progression Matrix</h3>
-                <p className="matrix-subtitle">Distance to {lvNames[currentLevelIndex + 1] || 'Final Rank'}</p>
+                <p className="matrix-subtitle">Next Milestone: {level.nextThreshold || 'Maximum Protocol'}</p>
               </div>
               <div className="matrix-telemetry">
                  <span className="telemetry-value">{points.toLocaleString()}</span>
@@ -136,30 +155,35 @@ const DashboardTab = ({ activeSubTab, user }) => {
               </div>
            </div>
 
-           <div className="progression-track">
+            <div className="progression-track">
               <div className="progression-bar-bg"></div>
-              <div className="progression-bar-fill" style={{ width: `${progressPercent}%` }}></div>
+              <div className="progression-bar-fill" style={{ width: `${level.progress}%`, background: level.color, boxShadow: `0 0 20px ${level.color}40` }}></div>
               
               <div className="progression-nodes">
-                {thresholds.map((t, i) => (
-                  <div key={i} className="progression-node">
-                    <div className={`node-dot ${points >= t ? 'active' : ''}`}></div>
-                    <div className="node-label-wrap">
-                       <span className={`node-rank ${points >= t ? 'text-white' : ''}`}>{lvNames[i].split(' ')[0]}</span>
-                       <span className="node-points">{t >= 1000 ? (t/1000)+'K' : t}</span>
-                    </div>
+                <div className="progression-node">
+                  <div className={`node-dot active`}></div>
+                  <div className="node-label-wrap">
+                    <span className="node-rank text-white">{level.label.split(' ')[1]}</span>
+                    <span className="node-points">NOW</span>
                   </div>
-                ))}
+                </div>
+                <div className="progression-node" style={{ left: '100%' }}>
+                  <div className={`node-dot`}></div>
+                  <div className="node-label-wrap" style={{ transform: 'translateX(-100%)' }}>
+                    <span className="node-rank">NEXT GEN</span>
+                    <span className="node-points">{level.nextThreshold || '---'}</span>
+                  </div>
+                </div>
               </div>
            </div>
 
-           <div className="acceleration-tip">
+            <div className="acceleration-tip">
               <div className="tip-icon-box">
                  <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '20px' }}>rocket_launch</span>
               </div>
               <p className="tip-text">
-                You are outperforming <span className="text-primary">84%</span> of guardians in your sector. 
-                Complete <span className="text-bold">5 more classifications</span> to accelerate rank progression.
+                You are outperforming <span className="text-primary">{Math.min(99, Math.floor(points / 250) + 12)}%</span> of guardians in your sector. 
+                Complete <span className="text-bold">more protocols</span> to accelerate rank progression.
               </p>
            </div>
         </div>
@@ -170,10 +194,10 @@ const DashboardTab = ({ activeSubTab, user }) => {
               <div className="hub-chart-wrap">
                 <Doughnut 
                   data={{
-                    labels: ['Scanned', 'Pending', 'Verified'],
+                    labels: doughnutLabels,
                     datasets: [{
-                      data: [65, 25, 10],
-                      backgroundColor: ['#8AEBFF', 'rgba(138, 235, 255, 0.2)', 'rgba(164, 214, 76, 0.4)'],
+                      data: doughnutValues,
+                      backgroundColor: ['#8AEBFF', '#22D3EE', '#5AB87A'],
                       borderWidth: 0,
                       cutout: '85%'
                     }]
@@ -181,9 +205,9 @@ const DashboardTab = ({ activeSubTab, user }) => {
                   options={chartOptions}
                 />
               </div>
-              <div className="impact-donut-inner">
-                 <span className="hub-value">12.4</span>
-                 <span className="hub-unit">Tons CO₂</span>
+               <div className="impact-donut-inner">
+                 <span className="hub-value">{impact.treesPlanted}</span>
+                 <span className="hub-unit">Trees planted</span>
               </div>
             </div>
             <p className="hub-desc">Estimated environmental impact based on your logged classifications.</p>
@@ -215,11 +239,11 @@ const DashboardTab = ({ activeSubTab, user }) => {
                {history.length > 0 ? history.slice(0, 8).map((entry, i) => (
                  <div key={i} className="ledger-item">
                     <div className="item-meta">
-                       <div className="item-icon-box">
+                        <div className="item-icon-box">
                           <span className="material-symbols-outlined" style={{ color: 'var(--primary)', fontSize: '18px' }}>
-                             {entry.category === 'Recyclable' ? 'recycling' : entry.category === 'Hazardous' ? 'warning' : 'delete'}
+                             {entry.type === 'WASTE_PIN' ? 'add_location_alt' : entry.type === 'DAILY_CHECKIN' ? 'event_available' : entry.type === 'CHAT_INSIGHT' ? 'forest' : 'recycling'}
                           </span>
-                       </div>
+                        </div>
                        <div>
                           <p className="item-name">{entry.item || 'Item Analysis'}</p>
                           <p className="item-date">{new Date(entry.date).toLocaleDateString()}</p>
@@ -241,10 +265,10 @@ const DashboardTab = ({ activeSubTab, user }) => {
             <div className="chart-canvas-wrap">
                <Bar 
                  data={{
-                   labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                   labels: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
                    datasets: [{
-                     label: 'Points',
-                     data: [120, 450, 300, 600, 200, 800, 350],
+                     label: 'Yield',
+                     data: weeklyData,
                      backgroundColor: '#8AEBFF',
                      borderRadius: 4
                    }]

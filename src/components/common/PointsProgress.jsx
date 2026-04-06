@@ -1,16 +1,11 @@
 import React from 'react';
+import { getLevelInfo } from '../../services/gamification';
 
 const PointsProgress = ({ user }) => {
   if (!user) return null;
 
-  // Thresholds matching db.js logic
-  const thresholds = [0, 500, 1500, 5000, 10000];
-  const lvNames = ["Eco Seedling", "Eco Warrior", "Green Guardian", "Earth Protector", "Planet Champion"];
-
   const points = user.points || 0;
-  const currentThresholdIndex = thresholds.findLastIndex(t => points >= t);
-  const nextTarget = thresholds[currentThresholdIndex + 1] || 10000;
-  const progressPercent = Math.min((points / nextTarget) * 100, 100);
+  const level = getLevelInfo(points);
 
   return (
     <div className="points-progress-bar" style={{
@@ -18,29 +13,35 @@ const PointsProgress = ({ user }) => {
       bottom: 0,
       left: 0,
       width: '100%',
-      height: '4px',
-      background: 'rgba(171,223,192,0.1)',
+      height: '3px',
+      background: 'rgba(255,255,255,0.02)',
       zIndex: 3000,
-      display: 'flex'
+      display: 'flex',
+      overflow: 'hidden'
     }}>
       <div style={{
-        width: `${progressPercent}%`,
+        width: `${level.progress}%`,
         height: '100%',
-        background: 'linear-gradient(90deg, var(--accent), var(--gold))',
-        boxShadow: '0 0 10px var(--accent)',
-        transition: 'width 1s ease-out'
+        background: `linear-gradient(90deg, ${level.color}, #8AEBFF)`,
+        boxShadow: `0 0 15px ${level.color}`,
+        transition: 'width 1.5s cubic-bezier(0.16, 1, 0.3, 1)'
       }}></div>
       <div style={{
         position: 'absolute',
-        right: '12px',
+        right: '16px',
         bottom: '8px',
-        fontSize: '10px',
-        fontWeight: 700,
-        color: 'var(--accent)',
-        textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-        letterSpacing: '0.5px'
+        fontSize: '9px',
+        fontWeight: 850,
+        color: level.color,
+        textTransform: 'uppercase',
+        letterSpacing: '0.15em',
+        background: 'rgba(0,0,0,0.6)',
+        padding: '2px 8px',
+        borderRadius: '4px',
+        backdropFilter: 'blur(4px)',
+        border: `1px solid ${level.color}20`
       }}>
-        {points.toLocaleString()} / {nextTarget.toLocaleString()} PTS &mdash; {lvNames[currentThresholdIndex]?.toUpperCase()}
+        {points.toLocaleString()} / {level.nextThreshold?.toLocaleString() || 'MAX'} XP &mdash; {level.label}
       </div>
     </div>
   );

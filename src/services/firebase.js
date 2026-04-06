@@ -20,8 +20,11 @@ import {
   addDoc,
   getDocs,
   query,
-  orderBy
+  orderBy,
+  limit,
+  arrayUnion
 } from "firebase/firestore";
+import { REWARD_TYPES, checkStreak, getLevelInfo } from "./gamification";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -113,19 +116,68 @@ export const createUserProfile = async (user, displayName = "", initialPoints = 
       displayName: displayName || user.displayName || "Eco Guardian",
       points: initialPoints,
       createdAt: new Date().toISOString(),
-      impactHistory: []
+      lastActive: new Date().toISOString(),
+      streak: 1,
+      impactHistory: [{
+        type: 'SIGNUP_BONUS',
+        points: initialPoints,
+        date: new Date().toISOString(),
+        label: 'Eco Genesis Bonus'
+      }]
     });
   }
 };
 
 /**
- * POINT SYSTEM: ADD POINTS
+ * UPDATED POINT SYSTEM: ACTIVITY-BASED
  */
-export const addPoints = async (userId, pointsToAdd) => {
+export const addActivityPoints = async (userId, activityType, metadata = {}) => {
   const userRef = doc(db, "users", userId);
-  await updateDoc(userRef, {
-    points: increment(pointsToAdd)
-  });
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) return null;
+
+  const userData = userSnap.data();
+  const reward = REWARD_TYPES[activityType];
+  if (!reward) return null;
+
+  // Streak/Daily logic
+  const streakRes = checkStreak(userData.lastActive, userData.streak || 0);
+  const finalXP = Math.floor(reward.xp * (streakRes.bonusMultiplier || 1));
+
+  const updatePayload = {
+    points: increment(finalXP),
+    lastActive: new Date().toISOString(),
+    impactHistory: arrayUnion({
+      type: activityType,
+      points: finalXP,
+      date: new Date().toISOString(),
+      label: reward.label,
+      ...metadata
+    })
+  };
+
+  if (streakRes.newActivity) {
+    updatePayload.streak = streakRes.updatedStreak;
+  }
+
+  await updateDoc(userRef, updatePayload);
+
+  return {
+    addedXP: finalXP,
+    newStreak: streakRes.updatedStreak,
+    isNewDay: streakRes.newActivity,
+    label: reward.label
+  };
+};
+
+/**
+ * GET LEADERBOARD (Top 10 Guardians)
+ */
+export const getLeaderboard = async () => {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, orderBy("points", "desc"), limit(10));
+  const querySnapshot = await getDocs(q);
+  return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 };
 
 

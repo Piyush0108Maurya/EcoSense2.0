@@ -1,8 +1,14 @@
-// DATABASE NOTE — READ BEFORE BUILDING abstraction layer for gamification
+import { getLevelInfo, REWARD_TYPES, checkStreak } from "./gamification";
+
+/**
+ * DATABASE PROXY (Local Cache)
+ * Syncs with Firestore but provides instant UI updates.
+ */
 export const DB = {
   getUser: () => {
     try {
-      return JSON.parse(localStorage.getItem("ecosense_user"));
+      const data = localStorage.getItem("ecosense_user");
+      return data ? JSON.parse(data) : null;
     } catch { return null; }
   },
 
@@ -13,28 +19,36 @@ export const DB = {
     } catch { return false; }
   },
 
-  updatePoints: (pts) => {
+  // Internal Logic for Instant UI updates before Firestore sync
+  applyActivityXP: (activityType, metadata = {}) => {
     const user = DB.getUser();
     if (!user) return null;
-    user.points += pts;
-    user.level = getLevel(user.points);
-    DB.saveUser(user);
-    return user;
-  },
 
-  addHistory: (item, result) => {
-    const user = DB.getUser();
-    if (!user) return null;
+    const reward = REWARD_TYPES[activityType];
+    if (!reward) return user;
+
+    const streakRes = checkStreak(user.lastActive, user.streak || 0);
+    const finalXP = Math.floor(reward.xp * (streakRes.bonusMultiplier || 1));
+
+    user.points = (user.points || 0) + finalXP;
+    user.lastActive = new Date().toISOString();
+    
+    if (streakRes.newActivity) {
+      user.streak = streakRes.updatedStreak;
+    }
+
     if (!user.impactHistory) user.impactHistory = [];
     user.impactHistory.unshift({
-      item, 
-      category: result.category,
-      points: result.ecoPoints,
-      date: new Date().toISOString()
+      type: activityType,
+      points: finalXP,
+      date: new Date().toISOString(),
+      label: reward.label,
+      ...metadata
     });
-    user.impactHistory = user.impactHistory.slice(0, 20); // keep last 20
+    user.impactHistory = user.impactHistory.slice(0, 50); // Keep history longer
+
     DB.saveUser(user);
-    return user;
+    return { user, addedXP: finalXP, label: reward.label };
   },
 
   logout: () => {
@@ -42,10 +56,4 @@ export const DB = {
   }
 };
 
-export const getLevel = (pts) => {
-  if (pts >= 10000) return "⭐ Planet Champion";
-  if (pts >= 5000) return "🌍 Earth Protector";
-  if (pts >= 1500) return "🌳 Green Guardian";
-  if (pts >= 500) return "🌿 Eco Warrior";
-  return "🌱 Eco Seedling";
-};
+export { getLevelInfo };

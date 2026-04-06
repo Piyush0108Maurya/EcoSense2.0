@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+import logo from '../../assets/logo.png';
+
 const Navbar = ({ activeTab, setActiveTab, user, onAuthClick, onLogout }) => {
   return (
     <nav className="navbar" style={{
@@ -8,17 +10,9 @@ const Navbar = ({ activeTab, setActiveTab, user, onAuthClick, onLogout }) => {
       background: 'rgba(1, 13, 8, 0.85)', backdropFilter: 'blur(30px)',
       borderBottom: '1px solid var(--border-subtle)', padding: '0 28px'
     }}>
-      <div className="nav-col-1" style={{ display: 'flex', alignItems: 'center' }}>
-        <svg width="130" height="32" viewBox="0 0 130 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="nav-logo" style={{ cursor: 'pointer', transition: 'all 0.4s' }}>
-          <path d="M14 30C11 30 3 24 3 15C3 8 9 3 12 7C14 10 14 30 14 30Z" fill="#2d6a4f" />
-          <path d="M14 30C17 30 25 24 25 15C25 8 19 3 16 7C14 10 14 30 14 30Z" fill="#40916c" />
-          <text
-            x="36"
-            y="23"
-            fill="var(--on-surface)"
-            style={{ fontFamily: 'var(--font-headline)', fontWeight: 600, fontSize: '18px', letterSpacing: '-0.3px' }}
-          >EcoSense</text>
-        </svg>
+      <div className="nav-col-1" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <img src={logo} alt="EcoSense Logo" style={{ height: '32px', width: 'auto', cursor: 'pointer' }} onClick={() => setActiveTab('dashboard')} />
+        <span style={{ fontFamily: 'var(--font-headline)', fontWeight: 600, fontSize: '18px', color: 'var(--on-surface)' }}>EcoSense</span>
       </div>
 
       <div className="nav-col-2" style={{ display: 'flex', justifyContent: 'center' }}>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { askGemini } from '../../services/api';
 import './LumiSpirit.css';
 
-const LumiSpirit = ({ isSidebarExpanded }) => {
+const LumiSpirit = ({ isSidebarExpanded, onPointsUpdate }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [messages, setMessages] = useState([
@@ -55,10 +55,10 @@ const LumiSpirit = ({ isSidebarExpanded }) => {
       const reply = await askGemini(systemPrompt, input, chatHistory);
 
       setMessages(prev => [...prev, {
-        role: 'model',
-        text: reply,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       }]);
+      
+      if (onPointsUpdate) onPointsUpdate('CHAT_INSIGHT');
     } catch (error) {
       console.error("Lumi AI error:", error);
       setMessages(prev => [...prev, {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoadingScreen.css';
+import logo from '../../assets/logo.png';
 
 const LoadingScreen = ({ onComplete, readyToUnmount }) => {
   const [progress, setProgress] = useState(0);
@@ -72,9 +73,9 @@ const LoadingScreen = ({ onComplete, readyToUnmount }) => {
               />
             </svg>
             
-            {/* Center Icon */}
+            {/* Center Icon replaced with Logo */}
             <div className="ls-center-icon">
-              <span className="material-symbols-outlined">eco</span>
+              <img src={logo} alt="EcoSense Logo" style={{ width: '40px', height: '40px', filter: 'drop-shadow(0 0 10px rgba(138, 235, 255, 0.4))' }} />
             </div>
 
             {/* Orbiting Particles */}
@@ -95,10 +96,7 @@ const LoadingScreen = ({ onComplete, readyToUnmount }) => {
         </div>
 
         <div className="ls-brand">
-          <div className="ls-logo-mark">
-            <div className="mark-leaf l1"></div>
-            <div className="mark-leaf l2"></div>
-          </div>
+          <img src={logo} alt="Logo" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
           <span className="ls-brand-name">ECOSENSE</span>
         </div>
       </div>
