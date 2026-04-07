@@ -1,0 +1,9 @@
+ M src/App.jsx
+ M src/components/Tabs/NeighbourWaste.jsx
+ M src/components/UI/AuthScreen.css
+ M src/components/UI/AuthScreen.jsx
+ M src/components/common/SideNav.jsx
+?? .git_porcelain.txt
+?? .git_porcelain_utf8.txt
+?? .git_status.txt
+?? .git_status_output.txt

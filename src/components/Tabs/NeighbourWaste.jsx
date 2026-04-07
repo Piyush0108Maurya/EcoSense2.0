@@ -10,10 +10,10 @@ import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
 let DefaultIcon = L.icon({
-    iconUrl: markerIcon,
-    shadowUrl: markerShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
@@ -28,7 +28,7 @@ function ChangeView({ center, zoom }) {
 const LocateControl = ({ userLocation }) => {
   const map = useMap();
   return (
-    <button 
+    <button
       className="floating-locate-btn"
       onClick={(e) => {
         e.stopPropagation();
@@ -56,7 +56,7 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
 
   useEffect(() => {
     fetchPins();
-    
+
     if (navigator.geolocation) {
       const watchId = navigator.geolocation.watchPosition(
         (pos) => {
@@ -112,7 +112,7 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
       reader.readAsDataURL(file);
       reader.onloadend = async () => {
         const base64data = reader.result;
-        
+
         await addWastePin({
           itemName: tempWasteName,
           photo: base64data,
@@ -143,7 +143,7 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
     if (pins.length === 0) return [
       { label: 'Activity', color: '#8AEBFF', count: 0, percentage: 0 }
     ];
-    
+
     return [
       { label: 'Verified Reports', color: '#8AEBFF', count: pins.length, percentage: Math.min(100, (pins.length / 10) * 100) },
       { label: 'Active Guardians', color: '#22D3EE', count: new Set(pins.map(p => p.userUid)).size, percentage: 45 }
@@ -160,7 +160,7 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
           <div className="nw-modal animate-in zoom-in-95 duration-200">
             <h3 className="nw-modal-title">Report New Waste</h3>
             <p className="nw-modal-desc">Describe the eco-anomaly detected at your location.</p>
-            <input 
+            <input
               autoFocus
               className="nw-modal-input"
               placeholder="e.g., Plastic Bottle, Cardboard Box"
@@ -197,19 +197,19 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
               Live Tracking & Heatmap
             </h2>
             <div className="map-controls">
-              <button 
-                className="pin-btn" 
+              <button
+                className="pin-btn"
                 onClick={handlePinAction}
                 disabled={loading}
               >
                 <span className="material-symbols-outlined">add_location_alt</span>
                 {loading ? 'Processing...' : 'Report Waste'}
               </button>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                style={{ display: 'none' }} 
-                accept="image/*" 
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/*"
                 onChange={handleFileChange}
               />
 
@@ -223,10 +223,10 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
               />
-              
+
               {/* Custom Google-maps style floating locate button */}
               <LocateControl userLocation={userLocation} />
-              
+
               {/* User Live Location Marker */}
               {userLocation && (
                 <CircleMarker
@@ -265,65 +265,65 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
         <div className="dashboard-sidebar animate-in fade-in slide-in-from-right-5 duration-700">
           {/* Real Feed Card (from Firebase) */}
           <div className="nw-card dashboard-feed">
-             <h2 className="nw-card-title">
-                <span className="material-symbols-outlined">rss_feed</span>
-                Community Live Feed
-             </h2>
-             <div className="nw-feed">
-                {pins.length > 0 ? (
-                  pins.slice(0, 5).map((item) => (
-                    <div key={item.id} className="nw-feed-item">
-                      <div className="nw-avatar" style={{ backgroundColor: `rgba(138, 235, 255, 0.1)`, border: `1px solid rgba(138, 235, 255, 0.3)`, color: '#8AEBFF' }}>
-                        {item.initials || item.userName?.substring(0,2).toUpperCase() || 'EG'}
-                      </div>
-                      <div className="nw-item-info">
-                        <div className="nw-item-user">{item.userName}</div>
-                        <div className="nw-item-action">Reported {item.itemName}</div>
-                      </div>
-                      <div className="nw-item-points" style={{ fontSize: '10px' }}>
-                        {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
+            <h2 className="nw-card-title">
+              <span className="material-symbols-outlined">rss_feed</span>
+              Community Live Feed
+            </h2>
+            <div className="nw-feed">
+              {pins.length > 0 ? (
+                pins.slice(0, 5).map((item) => (
+                  <div key={item.id} className="nw-feed-item">
+                    <div className="nw-avatar" style={{ backgroundColor: `rgba(138, 235, 255, 0.1)`, border: `1px solid rgba(138, 235, 255, 0.3)`, color: '#8AEBFF' }}>
+                      {item.initials || item.userName?.substring(0, 2).toUpperCase() || 'EG'}
                     </div>
-                  ))
-                ) : (
-                  <div className="text-gray-500 text-sm italic py-4">No reports yet in this sector.</div>
-                )}
-             </div>
+                    <div className="nw-item-info">
+                      <div className="nw-item-user">{item.userName}</div>
+                      <div className="nw-item-action">Reported {item.itemName}</div>
+                    </div>
+                    <div className="nw-item-points" style={{ fontSize: '10px' }}>
+                      {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-gray-500 text-sm italic py-4">No reports yet in this sector.</div>
+              )}
+            </div>
           </div>
 
           {/* Real Analytics Card */}
           <div className="nw-card dashboard-stats">
-             <h2 className="nw-card-title">
-                <span className="material-symbols-outlined">data_exploration</span>
-                Live Metrics
-             </h2>
-             <div className="nw-stats-list">
-                {realStats.map((stat, i) => (
-                  <div key={i} className="nw-stat-row">
-                    <div className="nw-stat-header">
-                      <span style={{ color: stat.color }}>{stat.label}</span>
-                      <span>{stat.count} items recorded</span>
-                    </div>
-                    <div className="nw-progress-bg">
-                      <div className="nw-progress-fill" style={{ width: `${stat.percentage}%`, backgroundColor: stat.color, boxShadow: `0 0 10px ${stat.color}40` }}></div>
-                    </div>
+            <h2 className="nw-card-title">
+              <span className="material-symbols-outlined">data_exploration</span>
+              Live Metrics
+            </h2>
+            <div className="nw-stats-list">
+              {realStats.map((stat, i) => (
+                <div key={i} className="nw-stat-row">
+                  <div className="nw-stat-header">
+                    <span style={{ color: stat.color }}>{stat.label}</span>
+                    <span>{stat.count} items recorded</span>
                   </div>
-                ))}
-             </div>
+                  <div className="nw-progress-bg">
+                    <div className="nw-progress-fill" style={{ width: `${stat.percentage}%`, backgroundColor: stat.color, boxShadow: `0 0 10px ${stat.color}40` }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Trial Status */}
           <div className="nw-card dashboard-challenge">
-             <h2 className="nw-card-title">
-                <span className="material-symbols-outlined">verified</span>
-                Sector Integrity
-             </h2>
-             <div className="nw-challenge-card" style={{ marginTop: 0 }}>
-                <div className="nw-challenge-title">Active Verification</div>
-                <div className="nw-challenge-desc">
-                  Reports are verified against live geospatial telemetry for protocol compliance.
-                </div>
-             </div>
+            <h2 className="nw-card-title">
+              <span className="material-symbols-outlined">verified</span>
+              Sector Integrity
+            </h2>
+            <div className="nw-challenge-card" style={{ marginTop: 0 }}>
+              <div className="nw-challenge-title">Active Verification</div>
+              <div className="nw-challenge-desc">
+                Reports are verified against live geospatial telemetry for protocol compliance.
+              </div>
+            </div>
           </div>
         </div>
       </div>

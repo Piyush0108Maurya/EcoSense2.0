@@ -34,11 +34,11 @@ function App() {
       if (firebaseUser) {
         // Fetch additional stats from Firestore
         const stats = await getUserStats(firebaseUser.uid);
-        
+
         if (stats) {
           setUser(stats);
           DB.saveUser(stats);
-          
+
           // Trigger Daily Check-in automatically
           handlePointsUpdate('DAILY_CHECKIN');
         }
@@ -79,7 +79,7 @@ function App() {
    */
   const handlePointsUpdate = async (activityType, metadata = {}) => {
     if (!user) return;
-    
+
     // 1. Instant UI Feedback (Local Proxy)
     const result = DB.applyActivityXP(activityType, metadata);
     if (result) {
@@ -159,7 +159,7 @@ function App() {
       </div>
 
       {showLogoutModal && (
-        <LogoutModal 
+        <LogoutModal
           user={user}
           onConfirm={confirmLogout}
           onCancel={() => setShowLogoutModal(false)}

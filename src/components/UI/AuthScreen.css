@@ -90,9 +90,11 @@
 .auth-container.signup-active .login-pane {
   transform: translateX(-100%);
 }
+
 .auth-container.signup-active .signup-pane {
   transform: translateX(0);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); /* full screen when active? */
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  /* full screen when active? */
 }
 
 /* ──── Refined Version: Sliding Overlay ──── */
@@ -284,7 +286,7 @@
   box-shadow: 0 0 25px rgba(138, 235, 255, 0.15);
 }
 
-.auth-input:focus + .input-icon {
+.auth-input:focus+.input-icon {
   color: #8AEBFF;
 }
 
@@ -400,11 +402,21 @@
 }
 
 @keyframes move-1 {
-  from { transform: translate(0, 0); }
-  to { transform: translate(-100px, 100px); }
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(-100px, 100px);
+  }
 }
 
 @keyframes move-2 {
-  from { transform: translate(0, 0); }
-  to { transform: translate(100px, -100px); }
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(100px, -100px);
+  }
 }
