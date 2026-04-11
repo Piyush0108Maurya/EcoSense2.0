@@ -16,6 +16,7 @@ import LoadingScreen from './components/UI/LoadingScreen';
 import AuthScreen from './components/UI/AuthScreen';
 import LogoutModal from './components/UI/LogoutModal';
 import Landing from './components/Landing/Landing';
+import Achievement from './components/UI/Achievement';
 
 function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
@@ -25,8 +26,9 @@ function App() {
   const [activeTab, setActiveTab] = useState('aqi');
   const [activeSubTab, setActiveSubTab] = useState(0);
   const [toast, setToast] = useState(null);
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showAchievement, setShowAchievement] = useState(null);
 
   useEffect(() => {
     // ── FIREBASE AUTH LISTENER ──
@@ -41,6 +43,23 @@ function App() {
 
           // Trigger Daily Check-in automatically
           handlePointsUpdate('DAILY_CHECKIN');
+
+          // ── CHECK FOR WELCOME ACHIEVEMENT ──
+          const hasSignupBonus = stats.impactHistory?.some(h => h.type === 'SIGNUP_BONUS');
+          const alreadySeen = localStorage.getItem(`achievement_seen_signup_${firebaseUser.uid}`);
+          
+          if (hasSignupBonus && !alreadySeen) {
+            // Delay slightly to follow the landing animation
+            setTimeout(() => {
+              setShowAchievement({
+                title: "Eco Genesis",
+                message: "Welcome to the EcoSense network, Guardian! Your path to environmental preservation begins here.",
+                points: 100,
+                icon: "🌿",
+                uid: firebaseUser.uid
+              });
+            }, 3000);
+          }
         }
         setIsLandingView(false); // Move into app if logged in
       } else {
@@ -154,8 +173,10 @@ function App() {
           {activeTab === 'dashboard' && <DashboardTab activeSubTab={activeSubTab} user={user} />}
         </div>
 
-        {/* Floating Lumi Spirit */}
-        <LumiSpirit isSidebarExpanded={sidebarExpanded} onPointsUpdate={handlePointsUpdate} />
+        {/* Floating Lumi Spirit (Hidden in Dashboard for better focus) */}
+        {activeTab !== 'dashboard' && (
+          <LumiSpirit isSidebarExpanded={sidebarExpanded} onPointsUpdate={handlePointsUpdate} />
+        )}
       </div>
 
       {showLogoutModal && (
@@ -171,6 +192,20 @@ function App() {
           message={toast.message}
           points={toast.points}
           onComplete={() => setToast(null)}
+        />
+      )}
+
+      {/* ── ACHIEVEMENT MODAL ── */}
+      {showAchievement && (
+        <Achievement
+          title={showAchievement.title}
+          message={showAchievement.message}
+          points={showAchievement.points}
+          icon={showAchievement.icon}
+          onComplete={() => {
+            localStorage.setItem(`achievement_seen_signup_${showAchievement.uid}`, 'true');
+            setShowAchievement(null);
+          }}
         />
       )}
     </div>

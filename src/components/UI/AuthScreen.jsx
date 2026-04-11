@@ -1,21 +1,25 @@
 import React, { useState } from 'react';
 import './AuthScreen.css';
-import { loginEmail, signUpEmail, loginWithGoogle } from '../../services/firebase.js';
+import { loginEmail, signUpEmail, loginWithGoogle, logout } from '../../services/firebase.js';
 
 const AuthScreen = ({ onBack }) => {
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
   // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
     setError('');
+    setSuccess('');
   };
 
   const handleLogin = async (e) => {
@@ -36,14 +40,40 @@ const AuthScreen = ({ onBack }) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess('');
     try {
       await signUpEmail(email, password, displayName);
+      // Auto-signed in by Firebase, so logout to redirect to sign-in
+      await logout();
+      
+      // Clear password for security, keep email for convenience
+      setPassword('');
+      
+      // Show Success Modal
+      setShowSuccessModal(true);
+      setCountdown(5);
+
     } catch (err) {
       setError(err.message || 'Failed to create account');
     } finally {
       setLoading(false);
     }
   };
+
+  // ── SUCCESS MODAL REDIRECTION TIMER ──
+  React.useEffect(() => {
+    let timer;
+    if (showSuccessModal && countdown > 0) {
+      timer = setTimeout(() => {
+        setCountdown(prev => prev - 1);
+      }, 1000);
+    } else if (showSuccessModal && countdown === 0) {
+      setShowSuccessModal(false);
+      setIsSignUp(false);
+      setSuccess('Protocol initialized. Please sign in to continue.');
+    }
+    return () => clearTimeout(timer);
+  }, [showSuccessModal, countdown]);
 
   const handleGoogle = async () => {
     setLoading(true);
@@ -80,7 +110,8 @@ const AuthScreen = ({ onBack }) => {
               <h1 className="auth-title">Welcome Back</h1>
               <p className="auth-subtitle">Continue your journey as an Eco Guardian.</p>
 
-              {error && !isSignUp && <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px' }}>{error}</div>}
+              {error && !isSignUp && <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(255, 107, 107, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.2)' }}>{error}</div>}
+              {success && !isSignUp && <div style={{ color: '#00cc88', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(0, 204, 136, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 204, 136, 0.2)' }}>{success}</div>}
 
               <div className="input-group">
                 <label className="input-label">Email Address</label>
@@ -136,7 +167,7 @@ const AuthScreen = ({ onBack }) => {
               <h1 className="auth-title">Hello Guardian</h1>
               <p className="auth-subtitle">Join the elite force protecting our planet.</p>
 
-              {error && isSignUp && <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px' }}>{error}</div>}
+              {error && isSignUp && <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(255, 107, 107, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.2)' }}>{error}</div>}
 
               <div className="input-group">
                 <label className="input-label">Full Name</label>
@@ -224,6 +255,35 @@ const AuthScreen = ({ onBack }) => {
 
         </div>
       </div>
+
+      {/* ── SUCCESS MODAL ── */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay">
+          <div className="success-modal-content">
+            <div className="success-icon-wrapper">
+              <div className="success-icon-ring"></div>
+              <span className="material-symbols-outlined success-check-icon">check_circle</span>
+            </div>
+            <h1 className="success-title">Guardian Created</h1>
+            <p className="success-message">
+              Protocol initialized successfully. Your identity has been verified and added to the EcoSense neural grid.
+            </p>
+            <div className="success-redirect-info">
+              Redirecting to Command Center in <span className="countdown-timer">{countdown}s</span>
+            </div>
+            <button 
+              className="auth-btn primary-auth-btn success-btn" 
+              onClick={() => {
+                setShowSuccessModal(false);
+                setIsSignUp(false);
+                setSuccess('Protocol initialized. Please sign in to continue.');
+              }}
+            >
+              Access Command Center
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

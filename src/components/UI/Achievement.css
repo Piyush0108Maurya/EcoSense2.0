@@ -1,0 +1,195 @@
+.achievement-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.9);
+  backdrop-filter: blur(25px) saturate(160%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none;
+}
+
+.achievement-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.achievement-card {
+  position: relative;
+  width: 440px;
+  max-width: 90%;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border: 1px solid rgba(138, 235, 255, 0.2);
+  border-radius: 40px;
+  padding: 40px 40px 32px;
+  text-align: center;
+  box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 1),
+              inset 0 0 40px rgba(138, 235, 255, 0.05);
+  transform: translateY(40px) scale(0.95);
+  transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+}
+
+.achievement-overlay.visible .achievement-card {
+  transform: translateY(0) scale(1);
+}
+
+.achievement-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #8AEBFF, #2DD4BF, #8AEBFF);
+  background-size: 200% auto;
+  animation: shimmer-top 3s linear infinite;
+}
+
+.achievement-icon-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+}
+
+.achievement-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, #8AEBFF55 0%, transparent 70%);
+  border-radius: 50%;
+  animation: pulse-glow 3s infinite alternate;
+}
+
+.achievement-icon {
+  position: relative;
+  font-size: 64px;
+  display: block;
+  z-index: 2;
+  filter: drop-shadow(0 0 15px rgba(138, 235, 255, 0.6));
+  animation: icon-float 4s ease-in-out infinite alternate;
+}
+
+.achievement-badge {
+  color: #8AEBFF;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.achievement-title {
+  font-family: var(--font-headline);
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.achievement-message {
+  color: #94A3B8;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+  max-width: 300px;
+  margin-inline: auto;
+}
+
+.achievement-points-display {
+  background: rgba(138, 235, 255, 0.04);
+  border: 1px solid rgba(138, 235, 255, 0.08);
+  padding: 16px;
+  border-radius: 24px;
+  margin-bottom: 28px;
+}
+
+.points-label {
+  display: block;
+  font-size: 9px;
+  color: rgba(148, 163, 184, 0.5);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  margin-bottom: 4px;
+}
+
+.points-value {
+  font-family: 'Space Grotesk', system-ui;
+  font-size: 40px;
+  font-weight: 900;
+  color: #2DD4BF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-shadow: 0 0 30px rgba(45, 212, 191, 0.4);
+}
+
+.points-plus {
+  color: #8AEBFF;
+  opacity: 0.8;
+}
+
+.achievement-claim-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #8AEBFF 0%, #2DD4BF 100%);
+  color: #020617;
+  border: none;
+  border-radius: 16px;
+  font-family: var(--font-headline);
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.achievement-claim-btn:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(138, 235, 255, 0.4);
+}
+
+/* ──── ANIMATIONS ──── */
+
+@keyframes shimmer-top {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  from { transform: scale(0.9); opacity: 0.3; }
+  to { transform: scale(1.2); opacity: 0.6; }
+}
+
+@keyframes icon-float {
+  from { transform: translateY(0); }
+  to { transform: translateY(-15px); }
+}
+
+/* Burst particles for extra flair */
+.achievement-burst {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(circle, #8AEBFF33 0%, transparent 70%);
+  opacity: 0;
+  animation: burst-in 0.8s cubic-bezier(0.1, 0.7, 1.0, 0.1) forwards 0.2s;
+}
+
+@keyframes burst-in {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}

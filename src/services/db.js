@@ -51,7 +51,6 @@ export const DB = {
       label: reward.label,
       ...metadata
     });
-    user.impactHistory = user.impactHistory.slice(0, 50); // Keep history longer
 
     DB.saveUser(user);
     return { user, addedXP: finalXP, label: reward.label };
