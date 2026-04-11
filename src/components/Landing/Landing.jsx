@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Landing.css';
-import logo from '../../assets/logo.png';
+import Logo from '../common/Logo';
 
 const Landing = ({ onStart }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -17,7 +17,7 @@ const Landing = ({ onStart }) => {
       {/* ── NAVIGATION ── */}
       <nav className={`lp-nav ${scrolled ? 'lp-nav--scrolled' : ''}`}>
         <div className="lp-nav__brand">
-          <img src={logo} alt="EcoSense" className="lp-nav__logo" />
+          <Logo size={32} className="lp-nav__logo" />
           <span className="lp-nav__name">EcoSense</span>
         </div>
         <div className="lp-nav__links">
@@ -272,7 +272,7 @@ const Landing = ({ onStart }) => {
         <div className="container lp-footer__inner">
           <div className="lp-footer__brand">
             <div className="lp-footer__logo">
-              <img src={logo} alt="EcoSense" style={{ height: '28px' }} />
+              <Logo size={28} />
               <span>EcoSense</span>
             </div>
             <p className="lp-footer__tagline">Engineering the future of planetary restoration through AI and collective community action.</p>

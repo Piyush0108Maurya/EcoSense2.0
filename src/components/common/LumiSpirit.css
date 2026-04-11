@@ -9,140 +9,196 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.lumi-avatar-spirit {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+.lumi-botanical-fairy {
+  width: 100px;
+  height: 100px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.lumi-avatar-spirit:hover {
-  transform: translateY(-8px) scale(1.1);
-}
-
-.lumi-spirit-core {
+.fairy-magic-field {
+  position: relative;
   width: 100%;
   height: 100%;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.spirit-layer {
+/* ── BIOLUMINESCENT BLOOM ── */
+.bloom-aura {
   position: absolute;
   border-radius: 50%;
-  filter: blur(10px);
-  transition: all 0.5s ease;
+  filter: blur(20px);
+  pointer-events: none;
 }
 
-.layer-1 {
+.bloom-aura.inner {
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+  animation: aura-expand 5s ease-in-out infinite alternate;
+}
+
+.bloom-aura.outer {
+  width: 160%;
+  height: 160%;
+  background: radial-gradient(circle, rgba(252, 211, 77, 0.1) 0%, transparent 70%);
+  animation: aura-expand 7s ease-in-out infinite alternate-reverse;
+}
+
+/* ── QUAD-WING SYSTEM ── */
+.fairy-wings-system {
+  position: absolute;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(217, 70, 239, 0.4) 0%, transparent 70%);
-  animation: spirit-float 4s ease-in-out infinite;
+  z-index: 1;
 }
 
-.layer-2 {
-  width: 80%;
-  height: 80%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.35) 0%, transparent 70%);
-  animation: spirit-float 4s ease-in-out infinite reverse;
-  animation-delay: -1s;
+.wing-pair {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.layer-3 {
-  width: 60%;
-  height: 60%;
-  background: radial-gradient(circle, rgba(217, 70, 239, 0.6) 0%, transparent 60%);
-  filter: blur(5px);
-  animation: spirit-pulse-fast 2s ease-in-out infinite;
+.pair-upper { animation: fly-upper 0.15s ease-in-out infinite alternate; }
+.pair-lower { animation: fly-lower 0.2s ease-in-out infinite alternate-reverse; opacity: 0.7; }
+
+.fairy-wing {
+  width: 45px;
+  height: 35px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(167, 243, 208, 0.3));
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 15px rgba(138, 235, 255, 0.2);
+  backdrop-filter: blur(2px);
 }
 
-.spirit-inner-core {
+.wing-tl { border-radius: 90% 10% 90% 10%; transform: rotate(-15deg); }
+.wing-tr { border-radius: 10% 90% 10% 90%; transform: rotate(15deg); }
+.wing-bl { border-radius: 80% 20% 80% 20%; transform: rotate(-30deg) scale(0.8); margin-top: 30px; }
+.wing-br { border-radius: 20% 80% 20% 80%; transform: rotate(30deg) scale(0.8); margin-top: 30px; }
+
+@keyframes fly-upper { from { transform: rotateX(0deg); } to { transform: rotateX(60deg); } }
+@keyframes fly-lower { from { transform: rotateX(0deg); } to { transform: rotateX(45deg); } }
+
+/* ── SILHOUETTE VESSEL ── */
+.fairy-silhouette-vessel {
   position: relative;
-  z-index: 2;
-  width: 44px;
-  height: 44px;
-  background: rgba(11, 17, 32, 0.8);
-  border: 1.5px solid rgba(217, 70, 239, 0.5);
+  z-index: 10;
+  width: 64px;
+  height: 64px;
+  background: rgba(6, 78, 59, 0.3);
+  backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(252, 211, 77, 0.4);
   border-radius: 50%;
-  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 15px rgba(217, 70, 239, 0.3), 0 0 20px rgba(217, 70, 239, 0.2);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.4), inset 0 0 20px rgba(252, 211, 77, 0.2);
+  animation: deity-sway 6s ease-in-out infinite;
 }
 
-.spirit-features .eye-glow {
-  filter: drop-shadow(0 0 3px #fff);
-  animation: blink 4s infinite;
+.fairy-body-svg {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.6));
 }
 
-.orbiting-orb {
+.nature-orb {
   position: absolute;
   width: 6px;
   height: 6px;
-  background: #D946EF;
   border-radius: 50%;
-  box-shadow: 0 0 10px #D946EF;
 }
 
-.orb-1 {
-  animation: orbit 3s linear infinite;
-}
+.o1 { background: #FCD34D; box-shadow: 0 0 10px #FCD34D; animation: orbit-orb 4s linear infinite; }
+.o2 { background: #A7F3D0; box-shadow: 0 0 10px #A7F3D0; animation: orbit-orb 6s linear infinite reverse; }
 
-.orb-2 {
-  animation: orbit 4s linear infinite reverse;
-}
-
-@keyframes spirit-float {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-5px) scale(1.1); }
-}
-
-@keyframes spirit-pulse-fast {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-}
-
-@keyframes orbit {
-  from { transform: rotate(0deg) translateX(35px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(35px) rotate(-360deg); }
-}
-
-@keyframes blink {
-  0%, 45%, 55%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(0.1); }
-}
-
-.lumi-offer-bubble {
+/* ── FAIRY DUST STREAM ── */
+.dust-stream {
   position: absolute;
-  left: 110%;
-  bottom: 10%;
-  white-space: nowrap;
-  background: linear-gradient(135deg, rgba(11, 17, 32, 0.95), rgba(0, 0, 0, 0.95));
-  border: 1px solid rgba(217, 70, 239, 0.4);
-  backdrop-filter: blur(12px);
-  padding: 8px 16px;
-  border-radius: 12px 12px 12px 2px;
-  color: #E8F4FD;
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  height: 200%;
   pointer-events: none;
-  animation: float-in 0.3s ease-out forwards;
 }
 
-@keyframes float-in {
-  from { opacity: 0; transform: translateX(-10px); }
-  to { opacity: 1; transform: translateX(0); }
+.dust-particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 5px #FCD34D;
+  opacity: 0;
+}
+
+.p0 { left: 20%; animation: fairy-dust 4s infinite 0.1s; }
+.p1 { left: 40%; animation: fairy-dust 5s infinite 1.2s; }
+.p2 { left: 60%; animation: fairy-dust 3s infinite 0.5s; }
+.p3 { left: 80%; animation: fairy-dust 6s infinite 2.3s; }
+.p4 { left: 50%; animation: fairy-dust 4s infinite 1.8s; }
+.p5 { left: 30%; animation: fairy-dust 5s infinite 0.9s; }
+
+@keyframes fairy-dust {
+  0% { transform: translateY(50px) scale(0); opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+
+@keyframes deity-sway {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-8px) rotate(2deg); }
+}
+
+@keyframes orbit-orb {
+  from { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+}
+
+/* ── PREMIUM HINT ── */
+.fairy-premium-hint {
+  position: absolute;
+  left: 110px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, rgba(6, 78, 59, 0.95), rgba(2, 44, 34, 0.95));
+  border: 1px solid rgba(252, 211, 77, 0.5);
+  padding: 12px 24px;
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  animation: hint-premium-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  white-space: nowrap;
+}
+
+.hint-main { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 800; color: #FCD34D; font-size: 14px; letter-spacing: 0.05em; }
+.hint-sub { font-size: 11px; color: rgba(255, 255, 255, 0.6); font-weight: 600; }
+.hint-icon { font-size: 24px; filter: drop-shadow(0 0 10px #10B981); }
+
+@keyframes hint-premium-in {
+  from { opacity: 0; transform: translateX(-20px) scale(0.8); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ── MINI CHAT (GOLD ACCENT) ── */
+.lumi-mini-chat {
+  position: absolute;
+  bottom: 110px;
+  left: 0;
+  width: 360px;
+  height: 560px;
+  background: rgba(2, 44, 34, 0.98);
+  border: 1.5px solid rgba(252, 211, 77, 0.3);
+  border-radius: 30px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(25px);
 }
 
 /* MINI CHAT BOX */

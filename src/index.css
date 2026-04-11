@@ -110,4 +110,19 @@
     border-top: 1px solid rgba(138, 235, 255, 0.1);
     backdrop-filter: blur(4px);
   }
+
+  /* Brand Identity */
+  .sidebar-logo-premium {
+    animation: eco-brand-pulse 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(138, 235, 255, 0.4));
+  }
+
+  @keyframes eco-brand-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.08); opacity: 1; filter: drop-shadow(0 0 15px rgba(138, 235, 255, 0.6)); }
+  }
+
+  .logo-glow {
+    filter: drop-shadow(0 0 15px var(--primary-glow));
+  }
 }

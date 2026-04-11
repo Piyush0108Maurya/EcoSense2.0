@@ -205,16 +205,65 @@ const COLLECTORS_DB = [
     rating: 4.0,
     verified: true,
   },
+  // ── PUNE ──────────────────────────────────────────────────
   {
-    id: 17, name: 'Patna E-Recyclers',
-    categories: ['ewaste', 'battery'],
-    lat: 25.6120, lon: 85.1442,
-    phone: '+91-9934001122',
-    address: 'Fraser Road, Patna - 800001',
-    timings: 'Mon–Sat: 10 AM – 6 PM',
-    city: 'Patna',
-    rating: 3.9,
-    verified: false,
+    id: 18, name: 'Pune Eco-Recycle Solutions',
+    categories: ['plastic', 'paper', 'metal', 'organic'],
+    lat: 18.5204, lon: 73.8567,
+    phone: '+91-9890123456',
+    address: 'Hadapsar Industrial Estate, Pune - 411013',
+    timings: 'Mon–Sat: 9 AM – 6 PM',
+    city: 'Pune',
+    rating: 4.7,
+    verified: true,
+  },
+  {
+    id: 19, name: 'Maha-E-Waste Sorters',
+    categories: ['ewaste', 'battery', 'hazardous'],
+    lat: 18.5590, lon: 73.9270,
+    phone: '+91-9876001122',
+    address: 'Viman Nagar, Pune - 411014',
+    timings: 'Mon–Sat: 10 AM – 7 PM',
+    city: 'Pune',
+    rating: 4.5,
+    verified: true,
+  },
+
+  // ── CHENNAI ───────────────────────────────────────────────
+  {
+    id: 20, name: 'Chennai Green Initiatives',
+    categories: ['plastic', 'organic', 'paper'],
+    lat: 13.0827, lon: 80.2707,
+    phone: '+91-4478901234',
+    address: 'Ambattur Industrial Estate, Chennai - 600058',
+    timings: 'Mon–Sun: 8 AM – 6 PM',
+    city: 'Chennai',
+    rating: 4.6,
+    verified: true,
+  },
+  {
+    id: 21, name: 'Safe-Medical Disposal Chennai',
+    categories: ['medical', 'hazardous'],
+    lat: 12.9717, lon: 80.2452,
+    phone: '+91-9840011223',
+    address: 'Guindy Industrial Estate, Chennai - 600032',
+    timings: 'Mon–Fri: 9 AM – 5 PM',
+    city: 'Chennai',
+    rating: 4.8,
+    verified: true,
+  },
+
+  // ── KOLKATA ───────────────────────────────────────────────
+  {
+    id: 22, name: 'Kolkata Urban Ecology Hub',
+    categories: ['plastic', 'metal', 'paper'],
+    lat: 22.5726, lon: 88.3639,
+    phone: '+91-3345678901',
+    address: 'Sector V, Salt Lake City, Kolkata - 700091',
+    timings: 'Mon–Sat: 9 AM – 7 PM',
+    city: 'Kolkata',
+    rating: 4.4,
+    verified: true,
   },
 ];
 
@@ -233,16 +282,13 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 /* ── Main Query Function ────────────────────────────────────── */
 /**
- * Get the nearest waste collectors for given coords + category.
- * @param {{ lat: number, lon: number }} coords
- * @param {string} categoryId - category id like 'plastic', 'ewaste' etc.
- * @param {number} maxResults - max number of results to return.
- * @returns {Array} sorted collector objects with `distanceKm` added.
+ * Get only verified waste collectors for given coords + category.
  */
 export function getNearestCollectors(coords, categoryId, maxResults = 8) {
   const { lat, lon } = coords;
 
   return COLLECTORS_DB
+    .filter(c => c.verified === true) // Strict Verify Rule
     .filter(c => !categoryId || c.categories.includes(categoryId))
     .map(c => ({
       ...c,

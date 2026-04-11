@@ -3,27 +3,6 @@ import { WASTE_CATEGORIES, getNearestCollectors, reverseGeocode } from '../../se
 import { DB } from '../../services/db';
 import './WasteGuide.css';
 
-/* ── Minimal Proximity Hub ────────────────────────── */
-const ProximityHub = ({ km }) => {
-  const isNear = km < 10;
-  const isExtreme = km > 100;
-  let status = 'Mid-Range'; let color = '#22D3EE';
-  if (isNear) { status = 'Local Spot'; color = '#5AB87A'; }
-  if (isExtreme) { status = 'Extreme Reach'; color = '#F97316'; }
-
-  return (
-    <div className="wg-prox-hub" style={{ '--hub-color': color }}>
-      <div className="wg-prox-bar">
-        <div className="wg-prox-fill" style={{ width: `${Math.min((km/120)*100, 100)}%` }} />
-      </div>
-      <div className="wg-prox-meta">
-        <span className="wg-prox-status">{status}</span>
-        <span className="wg-prox-val">{km} <span>km</span></span>
-      </div>
-    </div>
-  );
-};
-
 const WasteGuide = ({ onPointsUpdate }) => {
   const [location, setLocation]           = useState(null);
   const [cityName, setCityName]           = useState('');
@@ -59,7 +38,6 @@ const WasteGuide = ({ onPointsUpdate }) => {
     if (location) setCollectors(getNearestCollectors(location, catId));
     else detectLocation();
     
-    // Award points for using EcoSort analysis
     if (onPointsUpdate) onPointsUpdate('WASTE_SCAN', { item: WASTE_CATEGORIES.find(c => c.id === catId)?.label });
   };
 
@@ -84,69 +62,74 @@ const WasteGuide = ({ onPointsUpdate }) => {
       <div className="wg-grid-overlay" />
 
       <section className="wg-section">
-        
-        {/* ── PREMIUM CENTERED HERO ── */}
-        <div className="wg-hero-premium">
-          <div className="wg-brand-stack">
-            <div className="wg-badge-mini">🌍 Environment Dashboard</div>
-            <h1 className="wg-title-premium">
-              Eco<span>Sort</span>
-            </h1>
+        <div className={`wg-zen-hero ${selectedCategory ? 'compact' : ''}`}>
+          <div className="wg-zen-header">
+            <div className="wg-zen-badge-wrap">
+              <span className="wg-zen-badge">ECO-INTELLIGENCE</span>
+              <div className="badge-glow" />
+            </div>
+            <h1 className="wg-zen-title">Eco<span>Sort</span></h1>
+            {!selectedCategory && <p className="wg-zen-subtitle">Synchronize with local recycling sanctuaries for an enhanced planet.</p>}
           </div>
 
-          <div className="wg-control-group">
-            <div className="wg-location-scanner-v4">
+          <div className="wg-zen-controls">
+            {/* Location Pill */}
+            <div className={`wg-glass-pill wg-loc-pill ${location ? 'synchronized' : ''}`}>
               {locLoading ? (
-                <div className="wg-radar-bar">
-                  <div className="wg-radar-sweep-bar" />
-                  <span className="wg-radar-text-mini">SEARCHING SATELLITE...</span>
+                <div className="wg-liquid-loader">
+                  <div className="liquid-bubble" />
+                  <span>SENSING...</span>
                 </div>
               ) : (
-                <div className={`wg-loc-tile-v4 ${location ? 'located' : ''}`}>
+                <div className="wg-pill-content">
+                  <span className="material-symbols-outlined">{location ? 'share_location' : 'explore'}</span>
                   {location ? (
-                    <div className="wg-loc-found-v4 anim-pop-in">
-                      <div className="wg-loc-city-wrap">
-                        <div className="wg-loc-indicator"><span className="dot" /></div>
-                        <div className="wg-loc-content">
-                          <h3 className="city-label">{cityName || 'Unknown City'}</h3>
-                          <span className="coords-label">{location.lat.toFixed(4)}, {location.lon.toFixed(4)}</span>
-                        </div>
+                    <div className="wg-pill-text">
+                      <div className="primary-wrap">
+                        <span className="primary-text">{cityName || 'Unknown Sector'}</span>
+                        <span className="coord-tag">{location.lat.toFixed(3)}, {location.lon.toFixed(3)}</span>
                       </div>
-                      <button className="wg-refresh-mini" onClick={detectLocation} title="Refresh Location">
-                        <span className="material-symbols-outlined">refresh</span>
-                      </button>
+                      <span className="secondary-text">GLOBAL SYNC ACTIVE</span>
                     </div>
                   ) : (
-                    <button className="wg-btn-detect-v4" onClick={detectLocation}>
-                      <span className="material-symbols-outlined">my_location</span>
-                      <span>Detect Position</span>
+                    <button className="wg-pill-btn" onClick={detectLocation}>Initialize Position</button>
+                  )}
+                  {location && (
+                    <button className="wg-pill-action" onClick={detectLocation} title="Recalibrate">
+                      <span className="material-symbols-outlined">sync</span>
                     </button>
                   )}
                 </div>
               )}
             </div>
 
-            <div className={`wg-selector-v4 ${isMenuOpen ? 'portal-active' : ''}`} ref={menuRef}>
-              <button className={`wg-menu-trigger-v4 ${selectedCategory ? 'has-selection' : ''}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                <div className="wg-menu-trigger-content-v4">
-                  <span className="material-symbols-outlined">{activeCat ? activeCat.icon : 'category'}</span>
-                  <span className="label-text">{activeCat ? activeCat.label : 'Select Waste Type'}</span>
-                </div>
-                <span className={`material-symbols-outlined arrow ${isMenuOpen ? 'open' : ''}`}>expand_more</span>
+            <div className="wg-zen-connector">
+               <span className="material-symbols-outlined">navigate_next</span>
+            </div>
+
+            <div className={`wg-glass-pill wg-cat-pill ${(!location || locLoading) ? 'is-dormant' : ''} ${selectedCategory ? 'has-selection' : ''}`} ref={menuRef}>
+              <button 
+                className="wg-pill-trigger" 
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                disabled={!location || locLoading}
+              >
+                <span className="material-symbols-outlined">{activeCat ? activeCat.icon : 'format_paint'}</span>
+                <span className="trigger-label">{activeCat ? activeCat.label : 'Select Material'}</span>
+                <span className={`material-symbols-outlined arrow ${isMenuOpen ? 'open' : ''}`}>
+                  {(!location || locLoading) ? 'pending' : 'expand_more'}
+                </span>
               </button>
 
               {isMenuOpen && (
-                <div className="wg-menu-dropdown-v4 anim-slide-down">
-                  <div className="wg-menu-scroll">
-                    <div className="wg-menu-grid">
-                      {WASTE_CATEGORIES.map(cat => (
-                        <button key={cat.id} className={`wg-menu-item-v4 ${selectedCategory === cat.id ? 'active' : ''}`} onClick={() => handleCategorySelect(cat.id)}>
-                          <div className="wg-menu-item-icon-v4" style={{ color: cat.color }}><span className="material-symbols-outlined">{cat.icon}</span></div>
-                          <span className="wg-menu-item-label-v4">{cat.label}</span>
-                          <span className="wg-menu-item-emoji-v4">{cat.emoji}</span>
-                        </button>
-                      ))}
-                    </div>
+                <div className="wg-zen-dropdown anim-pop-in">
+                  <div className="dropdown-grid">
+                    {WASTE_CATEGORIES.map(cat => (
+                      <button key={cat.id} className={`wg-zen-item ${selectedCategory === cat.id ? 'active' : ''}`} onClick={() => handleCategorySelect(cat.id)}>
+                        <div className="item-orb" style={{ background: `radial-gradient(circle at 30% 30%, ${cat.color}, transparent)` }} />
+                        <span className="item-name">{cat.label}</span>
+                        <span className="item-emoji">{cat.emoji}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}
@@ -154,84 +137,72 @@ const WasteGuide = ({ onPointsUpdate }) => {
           </div>
         </div>
 
-        {locError && <div className="wg-error-banner-v3">{locError}</div>}
-
-        {/* ── LUXURY RESULTS AREA ── */}
         <div className="wg-main-display">
-          {selectedCategory ? (
-            <div className="wg-results-wrap">
-              <div className="wg-results-top">
-                <div className="wg-results-count"><span className="material-symbols-outlined">auto_awesome</span> Found {collectors.length} High-Ranked Collectors</div>
-              </div>
+          {locError && <div className="wg-error-banner-v3">{locError}</div>}
 
-              {location && collectors.length > 0 && (
-                <div className="wg-collector-grid-v5">
-                  {collectors.map((c, i) => (
-                    <div key={c.id} className={`wg-card-v5 ${contacted.has(c.id) ? 'contacted' : ''}`} style={{ '--idx': i, '--prox-color': c.distanceKm < 10 ? '#5AB87A' : (c.distanceKm > 100 ? '#F97316' : '#22D3EE') }}>
-                      
-                      <div className="wg-card-v5-inner">
-                        <div className="wg-card-v5-glow" />
-                        
-                        <div className="wg-card-v5-header">
-                          <div className="wg-card-v5-brand">
-                            <div className="wg-card-v5-avatar"><span className="material-symbols-outlined">recycling</span></div>
-                            <div className="wg-card-v5-names">
-                              <h3 className="collector-name">{c.name}</h3>
-                              <span className="collector-city">{c.city}</span>
-                            </div>
+          <div className="wg-results-wrap">
+            {collectors.length > 0 ? (
+              <div className="wg-zen-grid">
+                {collectors.map((c, i) => (
+                  <div 
+                    key={c.id} 
+                    className={`wg-zen-card ${contacted.has(c.id) ? 'contacted' : ''}`} 
+                    style={{ '--idx': i, '--accent-color': c.distanceKm < 10 ? '#5AB87A' : (c.distanceKm > 100 ? '#F97316' : '#8AEBFF') }}
+                  >
+                    <div className="wg-zen-card-inner">
+                      <div className="wg-zen-card-header">
+                        <div className="wg-zen-avatar"><span className="material-symbols-outlined">nature_people</span></div>
+                        <div className="wg-zen-titles">
+                          <div className="title-row">
+                            <h3>{c.name}</h3>
+                            <span className="material-symbols-outlined verified-shield">verified</span>
                           </div>
-                          <div className="wg-card-v5-stats">
-                            <div className="wg-card-v5-rating"><span className="material-symbols-outlined">star</span> {c.rating}</div>
-                            {c.verified && <div className="wg-card-v5-verified" title="Verified Expert"><span className="material-symbols-outlined">verified</span></div>}
-                          </div>
-                        </div>
-
-                        <ProximityHub km={c.distanceKm} />
-
-                        <div className="wg-card-v5-info">
-                          <div className="info-item"><span className="material-symbols-outlined">map</span> <span>{c.address}</span></div>
-                          <div className="info-item"><span className="material-symbols-outlined">schedule</span> <span>{c.timings}</span></div>
-                        </div>
-
-                        <div className="wg-card-v5-actions">
-                          <a href={`tel:${c.phone}`} className="wg-card-v5-btn-call" onClick={() => handleContacted(c)}>
-                            <span className="material-symbols-outlined">call</span>
-                            <span>{c.phone}</span>
-                          </a>
-                          <button className={`wg-card-v5-btn-done ${contacted.has(c.id) ? 'active' : ''}`} onClick={() => handleContacted(c)}>
-                            <span className="material-symbols-outlined">{contacted.has(c.id) ? 'check_circle' : 'handshake'}</span>
-                          </button>
+                          <span className="zen-tag">{c.city} • VERIFIED SANCTUARY</span>
                         </div>
                       </div>
 
-                      {contacted.has(c.id) && (
-                        <div className="wg-card-v5-overlay-done">
-                          <span className="material-symbols-outlined">verified</span>
-                          <p>Met & Secured +10 XP</p>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
+                      <div className="wg-zen-prox">
+                         <div className="prox-track"><div className="prox-fill" style={{ width: `${Math.min((c.distanceKm/120)*100, 100)}%` }} /></div>
+                         <div className="prox-labels">
+                           <span>HUB DISTANCE</span>
+                           <span className="dist">{c.distanceKm} KM</span>
+                         </div>
+                      </div>
 
-              {location && collectors.length === 0 && (
-                <div className="wg-empty-shelf"><span className="material-symbols-outlined">query_stats</span><p>No hubs found for this type in your area.</p></div>
-              )}
-            </div>
-          ) : (
-            <div className="wg-idle-v3">
-              <div className="wg-orb-stack">
-                <div className="wg-orb-core-v3" />
-                <div className="wg-orb-ring-v3 r1" />
-                <div className="wg-orb-ring-v3 r2" />
+                      <div className="wg-zen-details">
+                        <div className="detail"><span className="material-symbols-outlined">distance</span> <span>{c.address}</span></div>
+                        <div className="detail"><span className="material-symbols-outlined">nest_clock_farsight_analog</span> <span>{c.timings}</span></div>
+                      </div>
+
+                      <div className="wg-zen-actions">
+                        <a href={`tel:${c.phone}`} className="zen-btn-call" onClick={() => handleContacted(c)}>
+                          <span className="material-symbols-outlined">call</span>
+                          <span>{c.phone}</span>
+                        </a>
+                        <button className={`zen-btn-secure ${contacted.has(c.id) ? 'active' : ''}`} onClick={() => handleContacted(c)}>
+                          <span className="material-symbols-outlined">{contacted.has(c.id) ? 'eco' : 'add_task'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {contacted.has(c.id) && (
+                      <div className="wg-zen-card-success">
+                        <span className="material-symbols-outlined">eco</span>
+                        <p>SYNCHRONIZED</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-              <div className="wg-idle-text-v3">
-                <h2>Ready to Recycle?</h2>
-                <p>Choose a material to pinpoint verified collectors across the country.</p>
-              </div>
-            </div>
-          )}
+            ) : (
+              selectedCategory && (
+                <div className="wg-empty-shelf">
+                  <span className="material-symbols-outlined">potted_plant</span>
+                  <p>Searching for local sanctuaries...</p>
+                </div>
+              )
+            )}
+          </div>
         </div>
       </section>
     </div>

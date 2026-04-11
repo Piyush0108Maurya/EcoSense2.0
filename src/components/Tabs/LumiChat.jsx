@@ -36,6 +36,17 @@ const LumiChat = ({ onPointsUpdate }) => {
     scrollToBottom();
   }, [messages, loading]);
 
+  const PRE_WRITTEN_KNOWLEDGE = {
+    plastic_liquids: {
+      keywords: ['plastic', 'liquid', 'alternative', 'bottle', 'carry'],
+      answer: "To carry liquid items without plastic, I recommend transitioning to Stainless Steel, Glass, or BPA-Free Copper vessels. 🍶 These are durable, infinitely recyclable, and do not leach microplastics into your water. For bulk carrying, high-density food-grade silicone containers are excellent lightweight alternatives! 🌿"
+    },
+    water_pollution: {
+      keywords: ['pollution', 'water', 'bodies', 'river', 'sea', 'ocean', 'tips'],
+      answer: "Protecting our water bodies is vital! 💧 Here are my top tips: 1. Zero Grease: Never pour cooking oil down the drain. 2. Bio-Detergents: Switch to plant-based cleaners to avoid chemical runoff. 3. No Flushing: Never flush medicines or non-biodegradables down the toilet. 4. Natural Gardens: Reduce chemical fertilizer use that washes into storm drains. Small ripples create big waves! 🌊"
+    }
+  };
+
   const handleSend = async (customInput = null) => {
     const textToSend = typeof customInput === 'string' ? customInput : input;
     if (!textToSend.trim() || loading) return;
@@ -50,6 +61,28 @@ const LumiChat = ({ onPointsUpdate }) => {
     setInput('');
     setLoading(true);
 
+    // Check Local Knowledge first (To save API tokens)
+    const normalizedText = textToSend.toLowerCase();
+    let localMatch = null;
+
+    if (normalizedText.includes('plastic') && (normalizedText.includes('liquid') || normalizedText.includes('carry'))) {
+      localMatch = PRE_WRITTEN_KNOWLEDGE.plastic_liquids.answer;
+    } else if (normalizedText.includes('water') && (normalizedText.includes('pollution') || normalizedText.includes('bodies') || normalizedText.includes('tips'))) {
+      localMatch = PRE_WRITTEN_KNOWLEDGE.water_pollution.answer;
+    }
+
+    if (localMatch) {
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          role: 'model',
+          text: localMatch,
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]);
+        setLoading(false);
+      }, 800);
+      return;
+    }
+
     const systemPrompt = `
       You are Lumi, the AI environmental companion for EcoSense. 
       Your personality: Wise, encouraging, slightly mystical (like a forest spirit), but grounded in scientific data.
@@ -61,7 +94,6 @@ const LumiChat = ({ onPointsUpdate }) => {
     `;
 
     try {
-      // Pass the last 6 messages as history for context
       const chatHistory = messages.slice(-6).map(m => ({
         role: m.role,
         text: m.text

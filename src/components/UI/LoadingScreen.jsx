@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './LoadingScreen.css';
-import logo from '../../assets/logo.png';
+import Logo from '../common/Logo';
 
 const LoadingScreen = ({ onComplete, readyToUnmount }) => {
   const [progress, setProgress] = useState(0);
@@ -75,7 +75,7 @@ const LoadingScreen = ({ onComplete, readyToUnmount }) => {
             
             {/* Center Icon replaced with Logo */}
             <div className="ls-center-icon">
-              <img src={logo} alt="EcoSense Logo" style={{ width: '90px', height: '90px', filter: 'drop-shadow(0 0 20px rgba(138, 235, 255, 0.7))', animation: 'eco-pulse 3s infinite ease-in-out' }} />
+               <Logo size={100} className="loading-logo-pulse-premium" />
             </div>
 
             {/* Orbiting Particles */}
@@ -96,7 +96,7 @@ const LoadingScreen = ({ onComplete, readyToUnmount }) => {
         </div>
 
         <div className="ls-brand">
-          <img src={logo} alt="Logo" style={{ width: '36px', height: '36px', marginRight: '8px' }} />
+          <Logo size={40} className="ls-brand-logo-glow" />
           <span className="ls-brand-name">ECOSENSE</span>
         </div>
       </div>

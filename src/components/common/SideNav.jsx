@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import logo from '../../assets/logo.png';
+import Logo from './Logo';
 
 const NAV_ITEMS = [
   {
@@ -90,35 +90,52 @@ const SideNav = ({ activeTab, setActiveTab, user, expanded, setExpanded, onLogou
         {/* ── BRANDING (expanded only) ── */}
         <div style={{
           height: expanded ? 'auto' : 0,
-          padding: expanded ? '2px 16px 18px' : '0 16px',
+          padding: expanded ? '24px 20px 24px' : '0 16px',
           opacity: expanded ? 1 : 0,
           pointerEvents: expanded ? 'auto' : 'none',
-          transition: 'opacity 0.2s',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           overflow: 'hidden',
           flexShrink: 0,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-            <img src={logo} alt="Logo" style={{ width: '22px', height: '22px' }} />
-            <div style={{
-              fontSize: '9px',
-              fontFamily: 'Space Grotesk, sans-serif',
-              fontWeight: 700,
-              letterSpacing: '0.18em',
-              color: 'rgba(138,235,255,0.35)',
-              textTransform: 'uppercase',
-            }}>
-              Mission
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <Logo size={32} className="sidebar-logo-premium" />
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{
+                fontSize: '10px',
+                fontFamily: 'Space Grotesk, sans-serif',
+                fontWeight: 800,
+                letterSpacing: '0.25em',
+                color: 'rgba(138,235,255,0.4)',
+                textTransform: 'uppercase',
+                marginBottom: '2px'
+              }}>
+                Mission
+              </div>
+              <div style={{
+                 fontFamily: 'Space Grotesk, sans-serif',
+                 fontWeight: 800,
+                 fontSize: '22px',
+                 color: '#fff',
+                 letterSpacing: '-0.02em',
+                 lineHeight: 1,
+                 textShadow: '0 0 20px rgba(138,235,255,0.2)'
+              }}>
+                EcoSense
+              </div>
             </div>
           </div>
-          <div style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontWeight: 700,
-            fontSize: '20px',
-            color: '#E8F4FD',
-            letterSpacing: '-0.5px',
-            lineHeight: 1,
+          <div style={{ 
+            marginTop: '12px', 
+            fontSize: '9px', 
+            color: 'rgba(138,235,255,0.3)', 
+            fontWeight: 700, 
+            letterSpacing: '0.05em',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
           }}>
-            EcoSense
+            <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 5px #10B981' }}></span>
+            SYSTEM OPERATIONAL
           </div>
         </div>
 

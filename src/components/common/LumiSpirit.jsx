@@ -87,55 +87,96 @@ const LumiSpirit = ({ isSidebarExpanded, onPointsUpdate }) => {
       className={`lumi-spirit-wrapper ${isOpen ? 'active' : ''}`}
       style={{ left: `${sidebarWidth + 16}px` }}
     >
-      {/* Clickable Avatar Spirit */}
+      {/* Clickable High-Fidelity Nature Fairy */}
       <div 
-        className="lumi-avatar-spirit"
+        className="lumi-botanical-fairy"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="lumi-spirit-core">
-          {/* Layered Spirit Glows */}
-          <div className="spirit-layer layer-1"></div>
-          <div className="spirit-layer layer-2"></div>
-          <div className="spirit-layer layer-3"></div>
+        <div className="fairy-magic-field">
+          {/* Bioluminescent Bloom Aura */}
+          <div className="bloom-aura inner"></div>
+          <div className="bloom-aura outer"></div>
           
-          {/* The Face / Core */}
-          <div className="spirit-inner-core">
-            <svg viewBox="0 0 64 64" width="40" height="40">
-              <defs>
-                <linearGradient id="spiritGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#D946EF" />
-                  <stop offset="100%" stopColor="#8B5CF6" />
-                </linearGradient>
-              </defs>
-              
-              {/* Mystical facial features */}
-              <g className="spirit-features">
-                <circle cx="26" cy="30" r="1.5" fill="#fff" className="eye-glow" />
-                <circle cx="38" cy="30" r="1.5" fill="#fff" className="eye-glow" />
-                <path d="M28 38 Q32 41 36 38" stroke="#fff" strokeWidth="1.5" fill="none" strokeLinecap="round" opacity="0.8" />
-              </g>
-              
-              {/* Floating particles inside SVG */}
-              <circle cx="20" cy="20" r="1" fill="#fff" opacity="0.4">
-                <animate attributeName="cy" values="20;15;20" dur="3s" repeatCount="indefinite" />
-              </circle>
-              <circle cx="44" cy="24" r="1" fill="#fff" opacity="0.3">
-                <animate attributeName="cy" values="24;29;24" dur="4s" repeatCount="indefinite" />
-              </circle>
-            </svg>
+          {/* Quad-Wing System */}
+          <div className="fairy-wings-system">
+             <div className="wing-pair pair-upper">
+                <div className="fairy-wing wing-tl"></div>
+                <div className="fairy-wing wing-tr"></div>
+             </div>
+             <div className="wing-pair pair-lower">
+                <div className="fairy-wing wing-bl"></div>
+                <div className="fairy-wing wing-br"></div>
+             </div>
           </div>
           
-          {/* Orbiting Orbs */}
-          <div className="orbiting-orb orb-1"></div>
-          <div className="orbiting-orb orb-2"></div>
+          {/* Botanical Deity Silhouette */}
+          <div className="fairy-silhouette-vessel">
+            <svg viewBox="0 0 100 100" width="64" height="64" className="fairy-body-svg">
+              <defs>
+                <filter id="fairyGlow">
+                  <feGaussianBlur stdDeviation="1.5" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                <radialGradient id="wispGrad" cx="50%" cy="40%" r="60%">
+                  <stop offset="0%" stopColor="#fff" />
+                  <stop offset="60%" stopColor="#2DD4BF" />
+                  <stop offset="100%" stopColor="#064E3B" />
+                </radialGradient>
+              </defs>
+
+              <g filter="url(#fairyGlow)">
+                 {/* Head - Spiritual Essence */}
+                 <circle cx="50" cy="28" r="4.5" fill="#fff" />
+                 
+                 {/* Ethereal Wisp Body - No "Stick Man" limbs */}
+                 <path 
+                    d="M50 32 
+                       C60 40, 65 55, 52 75 
+                       C50 78, 48 75, 46 72
+                       C40 55, 45 40, 50 32" 
+                    fill="url(#wispGrad)" 
+                    opacity="0.9"
+                    className="spirit-wisp-body"
+                 />
+
+                 {/* Internal Life-Flow Sparkle */}
+                 <circle cx="50" cy="45" r="1.5" fill="#fff" opacity="0.6">
+                    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite" />
+                 </circle>
+              </g>
+
+              {/* Mystical Floating Petals around the core */}
+              <circle cx="35" cy="40" r="1" fill="#FCD34D" opacity="0.5">
+                 <animate attributeName="cy" values="40;35;40" dur="3s" repeatCount="indefinite" />
+              </circle>
+              <circle cx="65" cy="45" r="1.2" fill="#A7F3D0" opacity="0.4">
+                 <animate attributeName="cy" values="45;50;45" dur="4s" repeatCount="indefinite" />
+              </circle>
+            </svg>
+            
+            {/* Swirling Nature Orbs */}
+            <div className="nature-orb o1"></div>
+            <div className="nature-orb o2"></div>
+          </div>
+
+          {/* Exterior Fairy Dust Path */}
+          <div className="dust-stream">
+             {[...Array(6)].map((_, i) => (
+                <div key={i} className={`dust-particle p${i}`}></div>
+             ))}
+          </div>
         </div>
         
-        {/* Hover Offer Message */}
+        {/* Interaction Hint */}
         {isHovered && !isOpen && (
-          <div className="lumi-offer-bubble">
-            Need any help, Guardian? ✨
+          <div className="fairy-premium-hint">
+             <div className="hint-content">
+                <span className="hint-main">Nature's Wisdom</span>
+                <span className="hint-sub">Tap to speak with Lumi</span>
+             </div>
+             <div className="hint-icon">🌿</div>
           </div>
         )}
       </div>

@@ -134,9 +134,19 @@
   animation: eco-pulse 3s infinite ease-in-out;
 }
 
-@keyframes eco-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px var(--primary)); }
+.loading-logo-pulse-premium {
+  animation: eco-premium-boot 3s infinite ease-in-out;
+  filter: drop-shadow(0 0 25px rgba(138, 235, 255, 0.4));
+}
+
+@keyframes eco-premium-boot {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.9; }
+  50% { transform: scale(1.15) rotate(5deg); opacity: 1; filter: drop-shadow(0 0 35px var(--primary)); }
+}
+
+.ls-brand-logo-glow {
+  filter: drop-shadow(0 0 10px var(--primary-glow));
+  margin-right: 8px;
 }
 
 /* Orbiting Particles */
