@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   },
   {
     tab: 'waste',
-    label: 'Eco Sort',
+    label: 'EcoLens AI',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <polyline points="16 2 16 8 22 8" />
@@ -25,7 +25,7 @@ const NAV_ITEMS = [
   },
   {
     tab: 'neighbour',
-    label: 'Neighbour Waste',
+    label: 'EcoPulse',
     icon: (
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />

@@ -68,7 +68,7 @@ const WasteGuide = ({ onPointsUpdate }) => {
               <span className="wg-zen-badge">ECO-INTELLIGENCE</span>
               <div className="badge-glow" />
             </div>
-            <h1 className="wg-zen-title">Eco<span>Sort</span></h1>
+            <h1 className="wg-zen-title">EcoLens <span>AI</span></h1>
             {!selectedCategory && <p className="wg-zen-subtitle">Synchronize with local recycling sanctuaries for an enhanced planet.</p>}
           </div>
 

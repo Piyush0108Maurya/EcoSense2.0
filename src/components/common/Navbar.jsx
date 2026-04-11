@@ -34,7 +34,7 @@ const Navbar = ({ activeTab, setActiveTab, user, onAuthClick, onLogout }) => {
                   boxShadow: activeTab === tab ? '0 10px 25px var(--primary-dim)' : 'none'
                 }}
               >
-                {tab === 'aqi' ? 'Air Quality' : tab === 'waste' ? 'Eco-Sort' : tab === 'lumi' ? 'Lumi AI' : 'Dashboard'}
+                {tab === 'aqi' ? 'Air Quality' : tab === 'waste' ? 'EcoLens AI' : tab === 'lumi' ? 'Lumi AI' : 'Dashboard'}
               </button>
             ))}
           </div>

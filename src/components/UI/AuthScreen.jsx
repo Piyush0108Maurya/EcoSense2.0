@@ -107,13 +107,13 @@ const AuthScreen = ({ onBack }) => {
           {/* ────── LOGIN FORM ────── */}
           <div className="form-container login-container">
             <form onSubmit={handleLogin} className="auth-form">
-              <h1 className="auth-title">Welcome Back</h1>
-              <p className="auth-subtitle">Continue your journey as an Eco Guardian.</p>
+              <h1 className="auth-title" style={{ '--idx': 0 }}>Welcome Back</h1>
+              <p className="auth-subtitle" style={{ '--idx': 1 }}>Continue your journey as an Eco Guardian.</p>
 
-              {error && !isSignUp && <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(255, 107, 107, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.2)' }}>{error}</div>}
-              {success && !isSignUp && <div style={{ color: '#00cc88', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(0, 204, 136, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 204, 136, 0.2)' }}>{success}</div>}
+              {error && !isSignUp && <div style={{ '--idx': 1.5, color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(255, 107, 107, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.2)' }}>{error}</div>}
+              {success && !isSignUp && <div style={{ '--idx': 1.5, color: '#00cc88', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(0, 204, 136, 0.1)', borderRadius: '8px', border: '1px solid rgba(0, 204, 136, 0.2)' }}>{success}</div>}
 
-              <div className="input-group">
+              <div className="input-group" style={{ '--idx': 2 }}>
                 <label className="input-label">Email Address</label>
                 <div className="input-container">
                   <input
@@ -128,7 +128,7 @@ const AuthScreen = ({ onBack }) => {
                 </div>
               </div>
 
-              <div className="input-group">
+              <div className="input-group" style={{ '--idx': 3 }}>
                 <label className="input-label">Password</label>
                 <div className="input-container">
                   <input
@@ -143,13 +143,13 @@ const AuthScreen = ({ onBack }) => {
                 </div>
               </div>
 
-              <button type="submit" className="auth-btn primary-auth-btn" disabled={loading}>
+              <button type="submit" className="auth-btn primary-auth-btn" disabled={loading} style={{ '--idx': 4 }}>
                 {loading ? 'Authenticating...' : 'Commence Mission'}
               </button>
 
-              <div className="divider">OR</div>
+              <div className="divider" style={{ '--idx': 5 }}>OR</div>
 
-              <button type="button" onClick={handleGoogle} className="auth-btn google-btn" disabled={loading}>
+              <button type="button" onClick={handleGoogle} className="auth-btn google-btn" disabled={loading} style={{ '--idx': 6 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
@@ -164,12 +164,12 @@ const AuthScreen = ({ onBack }) => {
           {/* ────── SIGNUP FORM ────── */}
           <div className="form-container signup-container">
             <form onSubmit={handleSignUp} className="auth-form">
-              <h1 className="auth-title">Hello Guardian</h1>
-              <p className="auth-subtitle">Join the elite force protecting our planet.</p>
+              <h1 className="auth-title" style={{ '--idx': 0 }}>Hello Guardian</h1>
+              <p className="auth-subtitle" style={{ '--idx': 1 }}>Join the elite force protecting our planet.</p>
 
-              {error && isSignUp && <div style={{ color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(255, 107, 107, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.2)' }}>{error}</div>}
+              {error && isSignUp && <div style={{ '--idx': 1.5, color: '#ff6b6b', fontSize: '13px', marginBottom: '10px', padding: '10px', background: 'rgba(255, 107, 107, 0.1)', borderRadius: '8px', border: '1px solid rgba(255, 107, 107, 0.2)' }}>{error}</div>}
 
-              <div className="input-group">
+              <div className="input-group" style={{ '--idx': 2 }}>
                 <label className="input-label">Full Name</label>
                 <div className="input-container">
                   <input
@@ -184,7 +184,7 @@ const AuthScreen = ({ onBack }) => {
                 </div>
               </div>
 
-              <div className="input-group">
+              <div className="input-group" style={{ '--idx': 3 }}>
                 <label className="input-label">Email Address</label>
                 <div className="input-container">
                   <input
@@ -199,7 +199,7 @@ const AuthScreen = ({ onBack }) => {
                 </div>
               </div>
 
-              <div className="input-group">
+              <div className="input-group" style={{ '--idx': 4 }}>
                 <label className="input-label">Password</label>
                 <div className="input-container">
                   <input
@@ -214,13 +214,13 @@ const AuthScreen = ({ onBack }) => {
                 </div>
               </div>
 
-              <button type="submit" className="auth-btn primary-auth-btn" disabled={loading}>
+              <button type="submit" className="auth-btn primary-auth-btn" disabled={loading} style={{ '--idx': 5 }}>
                 {loading ? 'Creating Profile...' : 'Initialize Protocol'}
               </button>
 
-              <div className="divider">OR</div>
+              <div className="divider" style={{ '--idx': 6 }}>OR</div>
 
-              <button type="button" onClick={handleGoogle} className="auth-btn google-btn" disabled={loading}>
+              <button type="button" onClick={handleGoogle} className="auth-btn google-btn" disabled={loading} style={{ '--idx': 7 }}>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                   <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />

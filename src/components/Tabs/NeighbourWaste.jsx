@@ -182,7 +182,7 @@ const NeighbourWaste = ({ user, activeSubTab, onPointsUpdate }) => {
           <span className="nw-badge-dot"></span>
           <span className="nw-badge-text">LIVE Synchronization</span>
         </div>
-        <h1 className="nw-title">Neighbour Waste</h1>
+        <h1 className="nw-title">EcoPulse</h1>
         <p className="nw-subtitle">
           Real-time neighborhood waste management protocols and collective impact synchronization.
         </p>

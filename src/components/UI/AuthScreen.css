@@ -109,9 +109,13 @@
   border-radius: 32px;
   overflow: hidden;
   display: flex;
-  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(138, 235, 255, 0.05);
+  box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.9), inset 0 0 40px rgba(138, 235, 255, 0.05);
+  transition: transform 0.8s cubic-bezier(0.7, 0, 0.3, 1), box-shadow 0.8s ease;
 }
 
+.auth-container.signup-mode .auth-content-wrapper {
+  box-shadow: 0 40px 120px -20px rgba(138, 235, 255, 0.15);
+}
 
 .auth-overlay {
   position: absolute;
@@ -119,14 +123,30 @@
   left: 50%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  background: linear-gradient(135deg, #1E293B 0%, #080c14 100%);
   z-index: 10;
-  transition: transform 0.6s cubic-bezier(0.6, -0.28, 0.735, 0.045);
+  transition: transform 0.7s cubic-bezier(0.7, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   overflow: hidden;
+}
+
+.auth-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(138, 235, 255, 0.05), transparent);
+  transition: transform 0.7s cubic-bezier(0.7, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.auth-container.signup-mode .auth-overlay::before {
+  transform: translateX(50%);
 }
 
 .auth-container.signup-mode .auth-overlay {
@@ -139,27 +159,32 @@
   height: 100%;
   padding: 60px;
   text-align: center;
-  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.7s cubic-bezier(0.7, 0, 0.2, 1), opacity 0.5s ease;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  opacity: 1;
 }
 
 .overlay-left {
-  transform: translateX(-150%);
+  transform: translateX(-120%) scale(0.9);
+  opacity: 0;
 }
 
 .auth-container.signup-mode .overlay-left {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
+  opacity: 1;
 }
 
 .overlay-right {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
+  opacity: 1;
 }
 
 .auth-container.signup-mode .overlay-right {
-  transform: translateX(150%);
+  transform: translateX(120%) scale(0.9);
+  opacity: 0;
 }
 
 
@@ -168,15 +193,15 @@
   position: absolute;
   top: 0;
   height: 100%;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 42px 60px;
+  transition: all 0.7s cubic-bezier(0.7, 0, 0.2, 1);
+  padding: 42px 70px;
   width: 50%;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  opacity: 1;
+  transform: scale(1);
 }
-
-
 
 .login-container {
   left: 0;
@@ -184,7 +209,9 @@
 }
 
 .auth-container.signup-mode .login-container {
-  transform: translateX(100%);
+  transform: translateX(100%) scale(0.9);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .signup-container {
@@ -192,17 +219,38 @@
   width: 50%;
   opacity: 0;
   z-index: 1;
+  transform: translateX(-20%) scale(0.9);
+  pointer-events: none;
 }
 
 .auth-container.signup-mode .signup-container {
-  transform: translateX(100%);
+  transform: translateX(100%) scale(1);
   opacity: 1;
   z-index: 5;
+  pointer-events: auto;
 }
 
-/* Animation refinement */
-.auth-container.signup-mode .login-container {
+/* ──── Content Stagger ──── */
+.auth-form > * {
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(var(--idx) * 0.05s);
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.auth-container.signup-mode .login-container .auth-form > * {
+  transform: translateY(20px);
   opacity: 0;
+}
+
+.signup-container .auth-form > * {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.auth-container.signup-mode .signup-container .auth-form > * {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 /* ──── UI Elements ──── */

@@ -8,8 +8,40 @@ const Landing = ({ onStart }) => {
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    // Scroll Reveal Observer
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('reveal-visible');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      observer.disconnect();
+    };
   }, []);
+
+  const CountUp = ({ end, duration = 2000, suffix = "" }) => {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        setCount(Math.floor(progress * end));
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }, [end, duration]);
+    return <span>{count.toLocaleString()}{suffix}</span>;
+  };
 
   return (
     <div className="landing-page">
@@ -55,7 +87,7 @@ const Landing = ({ onStart }) => {
             {[
               { icon: '🌬️', label: 'AQI Monitor' },
               { icon: '♻️', label: 'AI Waste Sort' },
-              { icon: '📍', label: 'Eco Heatmap' },
+              { icon: '📍', label: 'EcoPulse' },
               { icon: '🏆', label: 'Guardian Ranks' },
             ].map(({ icon, label }) => (
               <div key={label} className="lp-pill">{icon} {label}</div>
@@ -76,43 +108,43 @@ const Landing = ({ onStart }) => {
       </section>
 
       {/* ── FEATURES STRIP ── */}
-      <section id="features" className="lp-features">
+      <section id="features" className="lp-features reveal">
         <div className="lp-features__glow lp-features__glow--cyan" />
         <div className="lp-features__glow lp-features__glow--purple" />
         <div className="container">
-          <div className="lp-section-header">
+          <div className="lp-section-header reveal-up">
             <span className="lp-tag">What EcoSense Offers</span>
             <h2 className="lp-section-title">Four Superpowers.<br /><span className="grad-cyan-white">One Platform.</span></h2>
           </div>
           <div className="lp-features__grid">
             {[
               {
-                icon: '🌬️',
-                color: '#8AEBFF',
-                colorDim: 'rgba(138,235,255,0.12)',
-                title: 'Live AQI Radar',
-                desc: 'Real-time air quality index, PM2.5, CO₂ and pollutant density pulled from global sensor nodes. Alerts before the air turns dangerous.',
+                icon: '🤖',
+                color: '#BB86FC',
+                colorDim: 'rgba(187,134,252,0.12)',
+                title: 'Lumi AI Companion',
+                desc: 'Your personal environmental intelligence. Ask Lumi for sustainability advice, AQI health impacts, or local recycling protocols.',
               },
               {
                 icon: '♻️',
                 color: '#A4D64C',
                 colorDim: 'rgba(164,214,76,0.12)',
-                title: 'AI Waste Classifier',
-                desc: 'Point your camera and Gemini 1.5 Flash identifies the material, assigns a disposal protocol, and awards you EcoPoints instantly.',
+                title: 'EcoLens AI',
+                desc: 'Snap a photo and our Gemini-powered AI classifies waste materials instantly, providing disposal guides and awarding reward points.',
+              },
+              {
+                icon: '🌬️',
+                color: '#8AEBFF',
+                colorDim: 'rgba(138,235,255,0.12)',
+                title: 'Live AQI Radar',
+                desc: 'Real-time air quality index monitoring across global sensor nodes. Get pollutant breakdowns and personalised health advisories.',
               },
               {
                 icon: '📍',
                 color: '#FB923C',
                 colorDim: 'rgba(251,146,60,0.12)',
-                title: 'Neighbour Waste Heatmap',
-                desc: "Pin waste violations on a live Leaflet map. See your area's pollution hotspots and coordinate community clean-ups.",
-              },
-              {
-                icon: '🏆',
-                color: '#BB86FC',
-                colorDim: 'rgba(187,134,252,0.12)',
-                title: 'Guardian Rank System',
-                desc: 'Earn XP for every action. Climb from Recruit to Supreme Guardian. Leaderboards, medals, and impact reports keep you motivated.',
+                title: 'EcoPulse',
+                desc: "Identify and pin pollution hotspots on a live interactive map. Coordinate with your neighbourhood to build a cleaner environment.",
               },
             ].map(({ icon, color, colorDim, title, desc }) => (
               <div key={title} className="lp-feature-card" style={{ '--card-color': color, '--card-dim': colorDim }}>
@@ -127,8 +159,10 @@ const Landing = ({ onStart }) => {
       </section>
 
       {/* ── AQI SECTION ── */}
-      <section id="aqi" className="lp-split lp-split--aqi">
+      <section id="aqi" className="lp-split lp-split--aqi reveal">
         <div className="lp-split__glow" />
+        <div className="lp-floating-icon" style={{ top: '10%', right: '5%', animationDelay: '0s' }}>☁️</div>
+        <div className="lp-floating-icon" style={{ bottom: '20%', left: '2%', animationDelay: '2s' }}>🧪</div>
         <div className="container lp-split__inner">
           <div className="lp-split__visual">
             <div className="lp-aqi-card glass-card">
@@ -177,8 +211,10 @@ const Landing = ({ onStart }) => {
       </section>
 
       {/* ── AI SORT + GUARDIAN SECTION ── */}
-      <section id="gamify" className="lp-split lp-split--reverse lp-split--purple">
+      <section id="gamify" className="lp-split lp-split--reverse lp-split--purple reveal">
         <div className="lp-split__glow lp-split__glow--purple" />
+        <div className="lp-floating-icon" style={{ top: '15%', left: '10%', animationDelay: '1s' }}>🤖</div>
+        <div className="lp-floating-icon" style={{ bottom: '15%', right: '8%', animationDelay: '3s' }}>🛡️</div>
         <div className="container lp-split__inner">
           <div className="lp-split__content">
             <span className="lp-tag" style={{ color: '#BB86FC' }}>Gamified Eco Action</span>
@@ -227,7 +263,7 @@ const Landing = ({ onStart }) => {
       </section>
 
       {/* ── IMPACT STRIP ── */}
-      <section className="lp-impact">
+      <section className="lp-impact reveal">
         <div className="lp-impact__glow" />
         <div className="container">
           <div className="lp-section-header">
@@ -236,14 +272,16 @@ const Landing = ({ onStart }) => {
           </div>
           <div className="lp-impact__grid">
             {[
-              { icon: '♻️', label: 'Items Classified', sublabel: 'by AI every day', color: '#8AEBFF' },
-              { icon: '🌍', label: 'Cities Monitored', sublabel: 'across global nodes', color: '#A4D64C' },
-              { icon: '📍', label: 'Waste Pins', sublabel: 'reported by community', color: '#FB923C' },
-              { icon: '🏆', label: 'Guardians Active', sublabel: 'climbing the ranks', color: '#BB86FC' },
-            ].map(({ icon, label, sublabel, color }) => (
+              { icon: '♻️', label: 'Items Classified', val: 14200, suffix: '+', sublabel: 'by AI every day', color: '#8AEBFF' },
+              { icon: '🌍', label: 'Cities Monitored', val: 124, suffix: '', sublabel: 'across global nodes', color: '#A4D64C' },
+              { icon: '📍', label: 'Waste Pins', val: 8930, suffix: '+', sublabel: 'reported by community', color: '#FB923C' },
+              { icon: '🏆', label: 'Guardians Active', val: 5620, suffix: '', sublabel: 'climbing the ranks', color: '#BB86FC' },
+            ].map(({ icon, label, val, suffix, sublabel, color }) => (
               <div key={label} className="lp-impact-card">
                 <div className="lp-impact-card__icon" style={{ color, filter: `drop-shadow(0 0 12px ${color})` }}>{icon}</div>
-                <div className="lp-impact-card__label" style={{ color }}>{label}</div>
+                <div className="lp-impact-card__label" style={{ color }}>
+                  <CountUp end={val} suffix={suffix} />
+                </div>
                 <div className="lp-impact-card__sub">{sublabel}</div>
                 <div className="lp-impact-card__line" style={{ background: color }} />
               </div>
@@ -253,7 +291,7 @@ const Landing = ({ onStart }) => {
       </section>
 
       {/* ── CTA BANNER ── */}
-      <section className="lp-cta-banner">
+      <section className="lp-cta-banner reveal">
         <div className="lp-cta-banner__glow" />
         <div className="container lp-cta-banner__inner">
           <h2 className="lp-cta-banner__title">Ready to Protect <span className="grad-cyan-purple">Your Environment?</span></h2>
